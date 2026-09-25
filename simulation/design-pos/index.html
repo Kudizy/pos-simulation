@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Kudizy POS V1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Literata:opsz,wght@7..72,600;7..72,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --kz: #078942;
+      --kz-d: #056b34;
+      --kz-s: #e8f6ee;
+      --ink: #171a1c;
+      --muted: #5c656c;
+      --line: #d8dde1;
+      --bg: #eef2ef;
+      --surf: #f3f6f4;
+      --white: #fff;
+      --danger: #b33a2b;
+      --warn: #a16207;
+      --radius: 14px;
+      --font: "Sora", sans-serif;
+      --display: "Literata", Georgia, serif;
+      --shadow: 0 14px 44px rgba(23, 26, 28, 0.09);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 70% 45% at 0% 0%, #cfead9 0%, transparent 50%),
+        radial-gradient(ellipse 50% 35% at 100% 5%, #e2ebe5 0%, transparent 45%),
+        linear-gradient(180deg, #eef2ef, #e3e8e5);
+      min-height: 100vh;
+      padding: 20px 14px 40px;
+    }
+    .shell { max-width: 1180px; margin: 0 auto; }
+    .top {
+      display: flex; flex-wrap: wrap; gap: 14px;
+      justify-content: space-between; align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .brand { display: flex; gap: 12px; align-items: center; }
+    .brand img { height: 34px; }
+    .brand h1 { font-family: var(--display); font-size: 1.3rem; }
+    .brand p { font-size: 0.72rem; color: var(--muted); }
+
+    .groups { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+    .group-label {
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); font-weight: 600; width: 100%; text-align: right;
+    }
+    .nav {
+      display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end;
+    }
+    .nav button {
+      border: 1px solid var(--line); background: var(--white);
+      font: 500 0.7rem var(--font); padding: 7px 10px; border-radius: 999px;
+      cursor: pointer; color: var(--ink);
+    }
+    .nav button.active {
+      background: var(--kz); border-color: var(--kz); color: #fff;
+    }
+    .nav button:hover:not(.active) { border-color: var(--kz); color: var(--kz); }
+
+    .device {
+      background: var(--white); border-radius: 26px; box-shadow: var(--shadow);
+      border: 1px solid rgba(7,137,66,.12); overflow: hidden; min-height: 680px;
+      display: flex; flex-direction: column;
+    }
+    .chrome {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 18px; background: linear-gradient(180deg,#fbfcfb,#f0f4f1);
+      border-bottom: 1px solid var(--line); font-size: 0.72rem; color: var(--muted);
+      gap: 10px;
+    }
+    .chrome strong { color: var(--ink); }
+    .chrome-right { display: flex; align-items: center; gap: 12px; }
+    .btn-gear {
+      display: none; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 12px;
+      border: 1px solid var(--line); background: #fff;
+      font-size: 1.25rem; line-height: 1; cursor: pointer; color: var(--ink);
+      flex-shrink: 0;
+    }
+    .btn-gear.show { display: inline-flex; }
+    .btn-gear:hover { border-color: var(--kz); color: var(--kz); background: var(--kz-s); }
+    .dots { display: flex; gap: 12px; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; background: var(--kz); margin-right: 4px; }
+    .dot.warn { background: var(--warn); }
+    .dot.bad { background: var(--danger); }
+
+    .screen { display: none; flex: 1; padding: 18px; flex-direction: column; }
+    .screen.active { display: flex; }
+
+    .btn {
+      border: none; border-radius: 12px; font: 600 0.9rem var(--font);
+      padding: 13px 16px; cursor: pointer;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-p { background: var(--kz); color: #fff; }
+    .btn-p:hover { background: var(--kz-d); }
+    .btn-g { background: transparent; border: 1px solid var(--line); color: var(--ink); }
+    .btn-d { background: transparent; border: 1px solid #f0c4be; color: var(--danger); }
+    .btn-lg { font-size: 1.05rem; padding: 16px 18px; border-radius: 14px; }
+    .btn-block { width: 100%; }
+    .row-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: auto; padding-top: 14px; }
+    .spacer { flex: 1; }
+
+    .title { font-family: var(--display); font-size: 1.45rem; margin-bottom: 4px; }
+    .sub { color: var(--muted); font-size: 0.84rem; margin-bottom: 16px; line-height: 1.4; }
+    .eyebrow {
+      font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); font-weight: 600; margin-bottom: 6px;
+    }
+
+    .field { margin-bottom: 12px; }
+    .field label {
+      display: block; font-size: 0.75rem; font-weight: 500; color: var(--muted); margin-bottom: 5px;
+    }
+    .field-hint {
+      display: block; font-size: 0.7rem; color: var(--muted); line-height: 1.35;
+      margin: -2px 0 6px; font-weight: 400;
+    }
+    .field input, .field select, .field textarea {
+      width: 100%; border: 1px solid var(--line); border-radius: 11px;
+      padding: 12px 14px; font: 500 0.95rem var(--font); background: var(--surf);
+    }
+    .field textarea { min-height: 64px; resize: vertical; }
+    .form-card {
+      max-width: 420px; margin: 0 auto; width: 100%;
+    }
+    .steps {
+      display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap;
+    }
+    .steps span {
+      font-size: 0.68rem; padding: 4px 8px; border-radius: 999px;
+      background: var(--surf); color: var(--muted); border: 1px solid var(--line);
+    }
+    .steps span.on { background: var(--kz-s); color: var(--kz-d); border-color: #b7e0c6; font-weight: 600; }
+
+    /* PIN */
+    .center { flex: 1; display: grid; place-items: center; }
+    .pin-box { width: min(340px, 100%); text-align: center; }
+    .pin-dots { display: flex; justify-content: center; gap: 12px; margin: 22px 0; }
+    .pin-dots i {
+      width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--kz);
+      display: inline-block;
+    }
+    .pin-dots i.on { background: var(--kz); }
+    .pad { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; }
+    .key {
+      background: var(--surf); border: none; border-radius: 12px;
+      font: 600 1.3rem var(--font); min-height: 60px; cursor: pointer;
+    }
+    .key:hover { background: var(--kz-s); }
+
+    /* Vente */
+    .vente {
+      display: grid; grid-template-columns: 1.25fr 0.95fr; gap: 14px; flex: 1; min-height: 0;
+    }
+    @media (max-width: 860px) { .vente { grid-template-columns: 1fr; } }
+    .search { display: flex; gap: 8px; margin-bottom: 12px; }
+    .search input {
+      flex: 1; border: 1px solid var(--line); border-radius: 11px;
+      padding: 11px 13px; font: 500 0.9rem var(--font); background: var(--surf);
+    }
+    .prods {
+      display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr));
+      gap: 8px; overflow: auto; max-height: 380px;
+    }
+    .prod {
+      border: 1px solid var(--line); border-radius: 12px; padding: 12px 10px;
+      background: linear-gradient(165deg,#fff,#f7faf8); text-align: left;
+      font-family: var(--font); cursor: pointer;
+    }
+    .prod:hover { border-color: var(--kz); }
+    .prod strong { display: block; font-size: 0.82rem; margin-bottom: 5px; }
+    .prod em { font-style: normal; color: var(--kz); font-weight: 600; font-size: 0.85rem; }
+    .prod .tg {
+      display: inline-block; margin-top: 6px; font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.04em; color: var(--muted); background: #fff;
+      border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px;
+    }
+    .tax-bar {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; align-items: center;
+    }
+    .tax-bar .eyebrow { margin: 0 6px 0 0; }
+    .tax-chip {
+      border: 1px solid var(--line); background: #fff; border-radius: 8px;
+      padding: 6px 9px; font: 600 0.68rem var(--font); cursor: pointer; color: var(--ink);
+    }
+    .tax-chip.on { border-color: var(--kz); background: var(--kz-s); color: var(--kz-d); }
+    .tax-chip small { display: block; font-weight: 500; color: var(--muted); font-size: 0.62rem; margin-top: 2px; }
+    .tax-help {
+      font-size: 0.7rem; color: var(--muted); line-height: 1.35; margin-bottom: 10px;
+      background: #fff; border: 1px dashed var(--line); border-radius: 10px; padding: 8px 10px;
+    }
+    .line-meta {
+      display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0;
+    }
+    .line-meta strong { font-size: 0.85rem; font-weight: 600; }
+    .line select {
+      border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px;
+      font: 500 0.72rem var(--font); background: #fff; max-width: 100%;
+    }
+    .fn-totals {
+      margin-top: 8px; font-size: 0.75rem; color: var(--muted);
+    }
+    .fn-totals div {
+      display: flex; justify-content: space-between; padding: 3px 0;
+    }
+    .cart {
+      background: var(--surf); border: 1px solid var(--line); border-radius: 16px;
+      padding: 14px; display: flex; flex-direction: column;
+    }
+    .cart h3 {
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--muted); margin-bottom: 10px;
+    }
+    .line {
+      display: flex; justify-content: space-between; gap: 8px;
+      padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 0.85rem;
+    }
+    .qty {
+      display: inline-flex; gap: 6px; align-items: center;
+    }
+    .qty button {
+      width: 26px; height: 26px; border-radius: 8px; border: 1px solid var(--line);
+      background: #fff; cursor: pointer; font-weight: 600;
+    }
+    .total {
+      margin-top: 10px; padding-top: 10px; border-top: 2px solid var(--ink);
+      display: flex; justify-content: space-between; align-items: baseline;
+    }
+    .total strong { font-family: var(--display); font-size: 1.4rem; }
+    .client-chip {
+      font-size: 0.78rem; background: #fff; border: 1px dashed var(--line);
+      border-radius: 10px; padding: 8px 10px; margin-bottom: 10px; color: var(--muted);
+    }
+    .client-box {
+      background: #fff; border: 1px solid var(--line); border-radius: 12px;
+      padding: 10px; margin-bottom: 12px;
+    }
+    .client-box .row-top {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px;
+    }
+    .client-box .row-top strong {
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600;
+    }
+    .client-box select, .client-box input {
+      width: 100%; border: 1px solid var(--line); border-radius: 8px;
+      padding: 8px 10px; font: 500 0.82rem var(--font); background: var(--surf);
+    }
+    .client-box .hint {
+      font-size: 0.68rem; color: var(--muted); margin-top: 6px; line-height: 1.3;
+    }
+    .client-add {
+      display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line);
+    }
+    .client-add.show { display: block; }
+    .client-add .field { margin-bottom: 8px; }
+    .client-add .field label { font-size: 0.7rem; }
+
+    .pay-grid {
+      display: grid; grid-template-columns: repeat(2,1fr); gap: 10px;
+      max-width: 480px; margin: 18px auto; width: 100%;
+    }
+    .pay {
+      border: 2px solid var(--line); border-radius: 14px; padding: 18px 12px;
+      background: #fff; font: 600 0.92rem var(--font); cursor: pointer; text-align: center;
+    }
+    .pay.on, .pay:hover { border-color: var(--kz); background: var(--kz-s); }
+    .amount {
+      font-family: var(--display); font-size: 2.2rem; color: var(--kz); text-align: center;
+    }
+
+    .result { max-width: 420px; margin: auto; text-align: center; width: 100%; }
+    .badge {
+      width: 68px; height: 68px; border-radius: 50%; margin: 0 auto 14px;
+      display: grid; place-items: center; font-size: 1.8rem;
+    }
+    .badge.ok { background: var(--kz-s); color: var(--kz); }
+    .badge.fail { background: #fdecea; color: var(--danger); }
+    .pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 16px 0 22px; }
+    .pill {
+      font-size: 0.75rem; font-weight: 600; padding: 7px 11px; border-radius: 999px;
+    }
+    .pill.ok { background: var(--kz-s); color: var(--kz-d); }
+    .pill.bad { background: #fdecea; color: var(--danger); }
+    .pill.warn { background: #fef3c7; color: var(--warn); }
+
+    .tiles {
+      display: grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap: 10px;
+    }
+    .tile {
+      border: 1px solid var(--line); border-radius: 14px; padding: 16px 12px;
+      background: linear-gradient(160deg,#fff,#f5f9f6); text-align: left;
+      font-family: var(--font); cursor: pointer; min-height: 100px;
+    }
+    .tile:hover { border-color: var(--kz); }
+    .tile .ico { color: var(--kz); font-size: 1.2rem; margin-bottom: 8px; }
+    .tile strong { display: block; font-size: 0.88rem; margin-bottom: 3px; }
+    .tile span { font-size: 0.72rem; color: var(--muted); line-height: 1.35; }
+
+    .list { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .list-row {
+      display: flex; justify-content: space-between; gap: 10px; align-items: center;
+      padding: 12px 14px; border-bottom: 1px solid var(--line); font-size: 0.85rem;
+      background: #fff;
+    }
+    .list-row:last-child { border-bottom: none; }
+    .tag {
+      font-size: 0.68rem; font-weight: 600; padding: 3px 8px; border-radius: 999px;
+      background: var(--kz-s); color: var(--kz-d);
+    }
+    .tag.off { background: #eee; color: var(--muted); }
+    .tag.fail { background: #fdecea; color: var(--danger); }
+
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 640px) { .split { grid-template-columns: 1fr; } }
+    .stat {
+      background: var(--surf); border: 1px solid var(--line); border-radius: 12px; padding: 14px;
+    }
+    .stat b { display: block; font-family: var(--display); font-size: 1.35rem; margin-top: 4px; }
+
+    .filters {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px; margin-bottom: 12px; padding: 12px; background: var(--surf);
+      border: 1px solid var(--line); border-radius: 14px;
+    }
+    .filters .field { margin: 0; }
+    .filters .field label { margin-bottom: 4px; }
+    .filters .field select, .filters .field input {
+      padding: 9px 10px; font-size: 0.82rem;
+    }
+    .tabs {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;
+    }
+    .tab {
+      border: 1px solid var(--line); background: #fff; border-radius: 999px;
+      padding: 7px 12px; font: 600 0.75rem var(--font); cursor: pointer; color: var(--ink);
+    }
+    .tab.on { background: var(--kz); border-color: var(--kz); color: #fff; }
+    .suivi-panel { display: none; }
+    .suivi-panel.on { display: block; }
+    .meta-line { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+    .filter-summary {
+      font-size: 0.75rem; color: var(--muted); margin-bottom: 12px; line-height: 1.4;
+    }
+    .notif {
+      display: flex; gap: 10px; align-items: flex-start;
+      background: #fff8e8; border: 1px solid #e8d4a8; border-radius: 12px;
+      padding: 10px 12px; margin-bottom: 12px; font-size: 0.8rem; line-height: 1.4;
+    }
+    .notif strong { color: var(--warn); }
+    .notif a { color: var(--kz); font-weight: 600; }
+    .toast-ok {
+      background: var(--kz-s); border: 1px solid #b7dfc4; color: var(--kz-d);
+      border-radius: 10px; padding: 8px 11px; font-size: 0.78rem; margin-bottom: 10px;
+      display: none;
+    }
+    .toast-ok.show { display: block; }
+    .avoir-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; margin-top: 6px; }
+
+    .drop {
+      border: 2px dashed var(--line); border-radius: 14px; padding: 28px 16px;
+      text-align: center; background: var(--surf); color: var(--muted); font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="top">
+      <div class="brand">
+        <img src="logo_green.svg" alt="Kudizy" />
+        <div>
+          <h1>Kudizy POS V1</h1>
+          <p>Simulation des étapes et fonctionnalités selon le cahier des charges V1</p>
+        </div>
+      </div>
+      <div class="groups">
+        <div>
+          <div class="group-label">Onboarding admin</div>
+          <div class="nav" id="nav-onb"></div>
+        </div>
+        <div>
+          <div class="group-label">Caisse</div>
+          <div class="nav" id="nav-caisse"></div>
+        </div>
+        <div>
+          <div class="group-label">Admin / Paramètres</div>
+          <div class="nav" id="nav-admin"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="device">
+      <div class="chrome">
+        <div><strong id="chrome-title">Kudizy POS</strong> · <span id="chrome-ctx">Premier démarrage</span></div>
+        <div class="chrome-right">
+          <div class="dots">
+            <span><i class="dot"></i>Réseau</span>
+            <span><i class="dot" id="print-dot"></i>Imprimante</span>
+          </div>
+          <button type="button" class="btn-gear" id="btn-chrome-gear" data-go="admin-gate" title="Paramètres admin" aria-label="Paramètres admin">⚙</button>
+        </div>
+      </div>
+
+      <!-- ========== ONBOARDING ========== -->
+      <section class="screen active" id="s-welcome" data-g="onb">
+        <div class="center">
+          <div class="form-card" style="text-align:center">
+            <div class="eyebrow">Bienvenue</div>
+            <h2 class="title">Configurer Kudizy POS</h2>
+            <p class="sub">Création compte, entreprise et factures normalisées.</p>
+            <button class="btn btn-p btn-lg btn-block" data-go="compte">Créer un compte</button>
+            <button class="btn btn-g btn-block" style="margin-top:10px" data-go="login">J’ai déjà un compte</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-login" data-g="onb">
+        <div class="form-card">
+          <div class="steps"><span class="on">Connexion</span></div>
+          <h2 class="title">Connexion admin</h2>
+          <p class="sub">Même compte Kudizy (email / mot de passe).</p>
+          <div class="field"><label>Email</label><input type="email" value="owner@boutique.bj" /></div>
+          <div class="field"><label>Mot de passe</label><input type="password" value="••••••••" /></div>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="welcome">Retour</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="entreprise">Continuer</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-compte" data-g="onb">
+        <div class="form-card">
+          <div class="steps">
+            <span class="on">1 Compte</span><span>2 Entreprise</span><span>3 FN</span><span>4 Magasin</span>
+          </div>
+          <h2 class="title">Créer le compte admin</h2>
+          <p class="sub">Étape 1 du démarrage.</p>
+          <div class="field"><label>Nom</label><input value="Adjoa Mensah" /></div>
+          <div class="field"><label>Email</label><input type="email" value="adjoa@boutique.bj" /></div>
+          <div class="field"><label>Téléphone</label><input value="+229 01 00 00 00" /></div>
+          <div class="field"><label>Mot de passe</label><input type="password" value="••••••••" /></div>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="welcome">Retour</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="entreprise">Suivant</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-entreprise" data-g="onb">
+        <div class="form-card">
+          <div class="steps">
+            <span>1 Compte</span><span class="on">2 Entreprise</span><span>3 FN</span><span>4 Magasin</span>
+          </div>
+          <h2 class="title">Créer l’entreprise</h2>
+          <p class="sub">Comme dans l’application Kudizy actuelle.</p>
+          <div class="field"><label>Nom commercial</label><input value="Mini Marché Akpakpa" /></div>
+          <div class="field"><label>IFU</label><input value="XXXXXXXXXXXX" /></div>
+          <div class="field"><label>Adresse</label><input value="Cotonou, Akpakpa" /></div>
+          <div class="field"><label>Téléphone entreprise</label><input value="+229 01 11 22 33" /></div>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="compte">Retour</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="fn">Configurer les FN</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-fn" data-g="onb">
+        <div class="form-card" style="max-width:480px">
+          <div class="steps">
+            <span>1 Compte</span><span>2 Entreprise</span><span class="on">3 FN</span><span>4 Magasin</span>
+          </div>
+          <h2 class="title">Activation facture normalisée</h2>
+          <p class="sub">Afin de pouvoir émettre votre facture normalisée, vous devrez faire valider vos informations par la DGI (Direction Générale des Impôts). Cette demande de validation se déroulera en 4 (quatre) étapes.</p>
+          <div class="list" style="margin-bottom:14px">
+            <div class="list-row"><span>1. Demande d’activation</span><span class="tag off">À faire</span></div>
+            <div class="list-row"><span>2. Validation de la demande</span><span class="tag off">Code email</span></div>
+            <div class="list-row"><span>3. Approbation (code NIM)</span><span class="tag off">DGI</span></div>
+            <div class="list-row"><span>4. Finalisation (jeton)</span><span class="tag off">Code email</span></div>
+          </div>
+          <p style="font-size:0.78rem;color:var(--muted);margin-bottom:12px;line-height:1.4">
+            Si vous possédez déjà un jeton valide dans votre compte Sygmef déjà configuré une fois sur Kudizy, vous pouvez poursuivre la configuration manuellement
+            en cliquant <a href="#" data-go="fn-manuel" style="color:var(--kz)">ici</a>.
+          </p>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="entreprise">Retour</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="fn1">Commencer la validation</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- FN Étape 1 -->
+      <section class="screen" id="s-fn1" data-g="onb">
+        <div class="form-card" style="max-width:520px">
+          <div class="steps">
+            <span class="on">FN 1/4 Demande</span><span>2 Validation</span><span>3 NIM</span><span>4 Jeton</span>
+          </div>
+          <h2 class="title">Étape 1 sur 4 · Demande d’activation</h2>
+          <p class="sub">Veuillez remplir les informations ci-dessous pour l’activation.</p>
+
+          <p class="eyebrow">Information sur le contribuable</p>
+          <div class="field">
+            <label>Êtes-vous consultant individuel ?</label>
+            <span class="field-hint">Sélectionnez « Oui » si vous êtes un particulier et « Non » si vous représentez une entreprise.</span>
+            <div class="split">
+              <button class="btn btn-g" type="button" disabled title="La configuration pour les particuliers n'est pas disponible pour le moment.">Oui</button>
+              <button class="btn btn-p" type="button">Non</button>
+            </div>
+            <span class="field-hint" style="margin-top:6px">La configuration pour les particuliers n’est pas disponible pour le moment.</span>
+          </div>
+          <div class="field">
+            <label>Identifiant fiscal</label>
+            <span class="field-hint">Entrez votre Identifiant Fiscal Unique (IFU) qui vous a été délivré par la Direction Générale des Impôts (DGI).</span>
+            <input value="XXXXXXXXXXXX" />
+          </div>
+          <div class="field">
+            <label>Raison social / Nom complet</label>
+            <input value="Mini Marché Akpakpa" readonly />
+          </div>
+          <div class="field">
+            <label>Adresse</label>
+            <span class="field-hint">Entrez l’adresse du siège social de votre entreprise (ex: C/2230, Maison Dossou Charles).</span>
+            <textarea>Akpakpa, Cotonou</textarea>
+          </div>
+          <div class="split">
+            <div class="field"><label>Ville</label><input value="Cotonou" /></div>
+            <div class="field"><label>Téléphone</label><input value="+229 01 11 22 33" /></div>
+          </div>
+          <div class="field"><label>Email</label><input type="email" value="contact@boutique.bj" /></div>
+
+          <p class="eyebrow" style="margin-top:8px">Information sur le secteur d’activité</p>
+          <div class="field">
+            <label>Domaine d’activité / Activité principale</label>
+            <span class="field-hint">Entrez l’activité principale de votre entreprise (ex: alimentation et nutrition pour enfants).</span>
+            <textarea>Commerce de détail</textarea>
+          </div>
+          <div class="field">
+            <label>Activités secondaires</label>
+            <span class="field-hint">Si vous n’avez pas d’activité secondaire, entrez votre activité principale.</span>
+            <textarea>Commerce de détail</textarea>
+          </div>
+
+          <p class="eyebrow" style="margin-top:8px">Informations sur le point de vente</p>
+          <div class="field">
+            <label>Nom du point de vente</label>
+            <span class="field-hint">Entrez le nom de votre point de vente ou de votre entreprise (ex: Kids Food Shop).</span>
+            <input value="Mini Marché Akpakpa" />
+          </div>
+          <div class="field">
+            <label>Adresse (rue, quartier, îlot, parcelle)</label>
+            <span class="field-hint">Donnez plus de précisions sur l’adresse de votre point de vente (ex: rue des oliviers, C/2230, Maison Dossou Charles à coté du marché Dantokpa).</span>
+            <textarea>Akpakpa</textarea>
+          </div>
+          <div class="field">
+            <label>Description de l’emplacement</label>
+            <span class="field-hint">Décrivez l’emplacement de votre point de vente (ex: magasin situé au cœur de Cotonou, à proximité du marché Dantokpa).</span>
+            <textarea>Magasin situé à Akpakpa, à proximité du marché</textarea>
+          </div>
+          <div class="field"><label>Ville du point de vente</label><input value="Cotonou" /></div>
+          <div class="split">
+            <div class="field"><label>Téléphone</label><input value="+229 01 11 22 33" /></div>
+            <div class="field"><label>E-mail</label><input type="email" value="contact@boutique.bj" /></div>
+          </div>
+          <div class="field">
+            <label>Numéro de téléphone supplémentaire</label>
+            <span class="field-hint">Entrez le même numéro de téléphone si vous n’en avez pas d’autre.</span>
+            <input value="+229 01 11 22 33" />
+          </div>
+
+          <p class="eyebrow" style="margin-top:8px">Informations sur le demandeur</p>
+          <div class="field">
+            <label>Nom complet</label>
+            <span class="field-hint">Entrez le nom et les prénoms de la personne qui fait la demande d’activation d’e-MECef.</span>
+            <input value="Adjoa Mensah" />
+          </div>
+          <div class="field">
+            <label>Titre</label>
+            <span class="field-hint">Entrez le titre du demandeur (ex: Responsable de la gestion des opérations).</span>
+            <input value="Gérante" />
+          </div>
+          <div class="field">
+            <label>Lieu</label>
+            <span class="field-hint">Entrez le lieu de la demande (ex: Cotonou, Bénin).</span>
+            <input value="Cotonou, Bénin" />
+          </div>
+
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="fn">Retour</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="fn2">Valider</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- FN Étape 2 -->
+      <section class="screen" id="s-fn2" data-g="onb">
+        <div class="form-card">
+          <div class="steps">
+            <span>FN 1 Demande</span><span class="on">2/4 Validation</span><span>3 NIM</span><span>4 Jeton</span>
+          </div>
+          <h2 class="title">Étape 2 sur 4 (Validation de votre demande)</h2>
+          <p class="sub">Un email a été envoyé à l’adresse associée à votre IFU par la DGI contenant un code de validation. Veuillez renseigner ce code pour valider votre demande.</p>
+          <p class="field-hint" style="margin-bottom:12px">Si vous ne l’avez pas eu dans votre boîte de réception, prière consulter votre dossier SPAM.</p>
+          <div class="field"><label>Code de validation</label><input placeholder="Code reçu par email" /></div>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="fn1">Annuler</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="fn3">Envoyer</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- FN Étape 3 -->
+      <section class="screen" id="s-fn3" data-g="onb">
+        <div class="form-card">
+          <div class="steps">
+            <span>FN 1 Demande</span><span>2 Validation</span><span class="on">3/4 NIM</span><span>4 Jeton</span>
+          </div>
+          <h2 class="title">Étape 3 sur 4 (Approbation de votre demande)</h2>
+          <div class="list" style="margin-bottom:12px">
+            <div class="list-row"><span>Statut DGI</span><span class="tag">Approuvée</span></div>
+          </div>
+          <p class="sub">Félicitations, votre demande a été approuvée. Un mail vous a été envoyé par la DGI contenant votre code NIM. Veuillez renseigner ce code NIM afin que Kudizy puisse procéder à la configuration de votre compte.</p>
+          <div class="field"><label>Code NIM</label><input placeholder="NIM reçu par email" /></div>
+          <p class="field-hint" style="margin-bottom:12px">Si encore en traitement : votre demande peut prendre jusqu’à 72 heures. Merci de patienter et de vérifier régulièrement votre boîte mail.</p>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="fn2">Annuler</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="fn4">Envoyer</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- FN Étape 4 -->
+      <section class="screen" id="s-fn4" data-g="onb">
+        <div class="form-card">
+          <div class="steps">
+            <span>FN 1 Demande</span><span>2 Validation</span><span>3 NIM</span><span class="on">4/4 Jeton</span>
+          </div>
+          <h2 class="title">Étape 4 sur 4 (Finalisation de votre demande)</h2>
+          <p class="sub">Un mail vous a été envoyé par la DGI contenant votre code de validation. Veuillez renseigner ce code pour finaliser la configuration de votre compte.</p>
+          <p class="field-hint" style="margin-bottom:12px">Si vous ne l’avez pas eu dans votre boîte de réception, prière consulter votre dossier SPAM.</p>
+          <div class="field"><label>Code de validation</label><input placeholder="Code reçu par email" /></div>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="fn3">Annuler</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="fn-ok">Valider</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-fn-ok" data-g="onb">
+        <div class="form-card" style="text-align:center">
+          <div class="badge ok">✓</div>
+          <h2 class="title">FN activée</h2>
+          <p class="sub">Configuration facture normalisée réussie. Vous pouvez poursuivre le setup magasin.</p>
+          <button class="btn btn-p btn-lg btn-block" data-go="magasin">Continuer · Magasin</button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-fn-manuel" data-g="onb">
+        <div class="form-card">
+          <h2 class="title">Activation manuelle de la facture normalisée</h2>
+          <p class="sub">Si vous possédez déjà un jeton valide dans votre compte Sygmef déjà configuré une fois sur Kudizy, vous pouvez poursuivre la configuration manuellement.</p>
+          <div class="field">
+            <label>Identifiant fiscal</label>
+            <span class="field-hint">Entrez votre Identifiant Fiscal Unique (IFU) qui vous a été délivré par la Direction Générale des Impôts (DGI).</span>
+            <input />
+          </div>
+          <div class="field">
+            <label>Code NIM</label>
+            <span class="field-hint">Code NIM reçu de la DGI / lié à votre espace Sygmef.</span>
+            <input />
+          </div>
+          <div class="field"><label>Jeton</label><input /></div>
+          <div class="field"><label>Date d’expiration</label><input type="date" /></div>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="fn">Annuler</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="fn-ok">Valider</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-magasin" data-g="onb">
+        <div class="form-card" style="max-width:520px">
+          <div class="steps">
+            <span>1 Compte</span><span>2 Entreprise</span><span>3 FN</span><span class="on">4 Magasin</span>
+          </div>
+          <h2 class="title">Points de caisse & PIN</h2>
+          <p class="sub">Au premier onboarding, vous devez obligatoirement définir votre <strong>PIN owner</strong> (accès Paramètres). Ensuite vous pouvez ajouter des caissiers.</p>
+
+          <div class="client-box" style="margin-bottom:14px;border-color:var(--kz);background:var(--kz-s)">
+            <p class="eyebrow" style="color:var(--kz-d)">Obligatoire · PIN owner</p>
+            <div class="field" style="margin-bottom:8px">
+              <label>Votre nom (owner)</label>
+              <input value="Adjoa Mensah" />
+            </div>
+            <div class="split">
+              <div class="field" style="margin:0">
+                <label>PIN owner (4 chiffres) *</label>
+                <input value="9012" maxlength="4" inputmode="numeric" />
+              </div>
+              <div class="field" style="margin:0">
+                <label>Confirmer le PIN *</label>
+                <input value="9012" maxlength="4" inputmode="numeric" />
+              </div>
+            </div>
+            <p class="hint">Ce PIN ouvre Paramètres admin. Distinct des PIN caissiers. Modifiable plus tard dans Caissiers & PIN.</p>
+          </div>
+
+          <div class="field"><label>Nom du point de caisse</label><input value="Caisse 1" /></div>
+          <p class="eyebrow" style="margin-top:10px">Caissiers (optionnel à cette étape)</p>
+          <div class="split" style="margin:8px 0 12px">
+            <div class="field" style="margin:0"><label>Caissier</label><input value="Marie" /></div>
+            <div class="field" style="margin:0"><label>PIN caissier</label><input value="4821" maxlength="4" /></div>
+          </div>
+          <button class="btn btn-g btn-block" style="margin-bottom:10px">+ Ajouter un autre caissier</button>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="fn">Retour</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="catalogue-setup">Continuer (PIN owner défini)</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-catalogue-setup" data-g="onb">
+        <div class="form-card" style="max-width:520px">
+          <h2 class="title">Produits & services</h2>
+          <p class="sub">Ajout unitaire ou import. Chaque article a un groupe de taxation FN (indépendant du prix).</p>
+          <div class="drop">Glisser un fichier CSV / Excel ici<br />ou <u>parcourir</u></div>
+          <div class="list" style="margin-top:14px">
+            <div class="list-row"><span>Eau 1,5 L <span class="tg" style="margin-left:4px">[B]</span></span><span>400 F</span></div>
+            <div class="list-row"><span>Pain <span class="tg" style="margin-left:4px">[A]</span></span><span>150 F</span></div>
+            <div class="list-row"><span>Service livraison <span class="tg" style="margin-left:4px">[B]</span></span><span>1 000 F</span></div>
+          </div>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="magasin">Retour</button>
+            <button class="btn btn-g" data-go="produits">+ Produit</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="imprimante">Imprimante</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-imprimante" data-g="onb">
+        <div class="form-card">
+          <h2 class="title">Imprimante 80 mm</h2>
+          <p class="sub">Bluetooth (Android) ou USB / LAN via Print Connector (desktop).</p>
+          <div class="list">
+            <div class="list-row"><span>Kudizy Certified TP-80</span><span class="tag">Sélectionnée</span></div>
+            <div class="list-row"><span>Connexion</span><span>Bluetooth / USB</span></div>
+            <div class="list-row"><span>Statut</span><span class="tag">Connectée</span></div>
+          </div>
+          <div class="row-actions">
+            <button class="btn btn-g">Tester l’impression</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="bind">Attacher le device</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-bind" data-g="onb">
+        <div class="form-card">
+          <h2 class="title">Attacher ce device</h2>
+          <p class="sub">Lie ce téléphone / navigateur à l’entreprise et au point de caisse. Ensuite les caissiers n’utilisent que leur PIN.</p>
+          <div class="field"><label>Entreprise</label><input value="Mini Marché Akpakpa" readonly /></div>
+          <div class="field"><label>Point de caisse</label>
+            <select><option>Caisse 1</option><option>Comptoir</option></select>
+          </div>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="imprimante">Retour</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p btn-lg" data-go="pin">Confirmer · Écran PIN</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== CAISSE ========== -->
+      <section class="screen" id="s-pin" data-g="caisse">
+        <div class="center">
+          <div class="pin-box">
+            <div class="eyebrow">Mode caisse</div>
+            <h2 class="title">Saisir le PIN</h2>
+            <p class="sub">Device lié · Mini Marché Akpakpa · Caisse 1</p>
+            <div class="pin-dots" id="pin-dots"><i></i><i></i><i></i><i></i></div>
+            <div class="pad" id="pad">
+              <button class="key" data-k="1">1</button><button class="key" data-k="2">2</button><button class="key" data-k="3">3</button>
+              <button class="key" data-k="4">4</button><button class="key" data-k="5">5</button><button class="key" data-k="6">6</button>
+              <button class="key" data-k="7">7</button><button class="key" data-k="8">8</button><button class="key" data-k="9">9</button>
+              <button class="key" data-k="c">⌫</button><button class="key" data-k="0">0</button><button class="key" data-k="ok">OK</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-shift-open" data-g="caisse">
+        <div class="form-card">
+          <div class="eyebrow">Marie · Caisse 1</div>
+          <h2 class="title">Ouvrir le shift</h2>
+          <p class="sub">Période de travail avant d’encaisser.</p>
+          <div class="field"><label>Fond de caisse (optionnel)</label><input value="5 000" /></div>
+          <button class="btn btn-p btn-lg btn-block" data-go="vente">Ouvrir et vendre</button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-vente" data-g="caisse">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:start;margin-bottom:8px">
+          <div>
+            <div class="eyebrow">Marie · Shift ouvert</div>
+            <h2 class="title" style="margin:0">Vente</h2>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-g" style="padding:8px 10px;font-size:0.75rem" data-go="historique">Historique</button>
+          </div>
+        </div>
+        <div class="vente">
+          <div>
+            <div class="search">
+              <input id="prod-search" type="search" placeholder="Rechercher produit / service…" autocomplete="off" />
+            </div>
+            <p class="field-hint" style="margin-bottom:10px" id="prod-search-hint">Tapez pour filtrer le catalogue (ex. « eau », « pain »).</p>
+            <div class="prods" id="prod-grid">
+              <button class="prod" data-name="eau 1,5 l"><strong>Eau 1,5 L</strong><em>400 F</em><span class="tg">[B]</span></button>
+              <button class="prod" data-name="riz 1 kg"><strong>Riz 1 kg</strong><em>1 200 F</em><span class="tg">[B]</span></button>
+              <button class="prod" data-name="huile 1 l"><strong>Huile 1 L</strong><em>1 800 F</em><span class="tg">[B]</span></button>
+              <button class="prod" data-name="savon"><strong>Savon</strong><em>350 F</em><span class="tg">[A]</span></button>
+              <button class="prod" data-name="pain"><strong>Pain</strong><em>150 F</em><span class="tg">[A]</span></button>
+              <button class="prod" data-name="livraison service"><strong>Livraison</strong><em>1 000 F</em><span class="tg">[B]</span></button>
+            </div>
+            <p class="field-hint" id="prod-empty" style="display:none;margin-top:8px">Aucun produit ne correspond à la recherche.</p>
+          </div>
+          <aside class="cart">
+            <h3>Panier de vente</h3>
+            <div class="client-box">
+              <div class="row-top">
+                <strong>Client</strong>
+                <button type="button" class="btn btn-g" style="padding:5px 9px;font-size:0.7rem" id="btn-add-client">+ Ajouter</button>
+              </div>
+              <select id="client-select" aria-label="Client de la vente">
+                <option value="default" selected>Client par défaut (Comptoir)</option>
+                <option value="1">Koffi Assogba · 01 22…</option>
+                <option value="2">Boutique Les Palmiers</option>
+              </select>
+              <p class="hint">Si aucun client n’est choisi, la vente utilise le client par défaut.</p>
+              <div class="client-add" id="client-add">
+                <div class="field"><label>Nom / Raison sociale</label><input placeholder="Nom du client" /></div>
+                <div class="field"><label>Téléphone</label><input placeholder="+229 …" /></div>
+                <div class="field"><label>IFU (si besoin)</label><input placeholder="Optionnel" /></div>
+                <button type="button" class="btn btn-p btn-block" style="padding:9px;font-size:0.8rem;margin-top:4px" id="btn-save-client">Enregistrer le client</button>
+              </div>
+            </div>
+            <div class="line">
+              <div class="line-meta">
+                <strong>Eau 1,5 L <span class="tg">[B]</span></strong>
+                <span class="field-hint" style="margin:0">Groupe défini sur la fiche produit</span>
+              </div>
+              <span class="qty"><button>-</button>2<button>+</button></span>
+              <span>800 F</span>
+            </div>
+            <div class="line">
+              <div class="line-meta">
+                <strong>Pain <span class="tg">[A]</span></strong>
+                <span class="field-hint" style="margin:0">Groupe défini sur la fiche produit</span>
+              </div>
+              <span class="qty"><button>-</button>1<button>+</button></span>
+              <span>150 F</span>
+            </div>
+            <div class="fn-totals">
+              <div><span>Total Exonérés [A]</span><span>150 F</span></div>
+              <div><span>Total H.T. [B]</span><span>678 F</span></div>
+              <div><span>Total TVA [B]</span><span>122 F</span></div>
+            </div>
+            <div class="total"><span>Total TTC</span><strong>950 F</strong></div>
+            <button class="btn btn-p btn-lg btn-block" style="margin-top:12px" data-go="paiement">Encaisser</button>
+          </aside>
+        </div>
+      </section>
+
+      <section class="screen" id="s-paiement" data-g="caisse">
+        <div style="text-align:center;margin-top:8px">
+          <p class="sub" style="margin-bottom:4px">Mode de paiement · sans processeur (PSP)</p>
+          <h2 class="title">À encaisser</h2>
+          <div class="amount">950 F</div>
+        </div>
+        <div class="pay-grid" id="pays">
+          <button class="pay on">Espèces</button>
+          <button class="pay">Mobile Money</button>
+          <button class="pay">Carte</button>
+          <button class="pay">Virement</button>
+          <button class="pay">Autre</button>
+        </div>
+        <div class="row-actions" style="max-width:480px;margin:0 auto;width:100%">
+          <button class="btn btn-g" data-go="vente">Retour</button>
+          <span class="spacer"></span>
+          <button class="btn btn-p btn-lg" data-go="resultat-ok">Confirmer</button>
+        </div>
+        <p style="text-align:center;margin-top:12px;font-size:0.75rem;color:var(--muted)">
+          Démo échec print : <a href="#" data-go="resultat-fail" style="color:var(--kz)">voir écran</a>
+        </p>
+      </section>
+
+      <section class="screen" id="s-resultat-ok" data-g="caisse">
+        <div class="result">
+          <div class="badge ok">✓</div>
+          <h2 class="title">Vente terminée</h2>
+          <p class="sub">Le caissier termine une vente ; Kudizy fiscalise automatiquement.</p>
+          <div class="pills">
+            <span class="pill ok">Fiscal (FN) : OK</span>
+            <span class="pill ok">Impression : OK</span>
+          </div>
+          <div class="row-actions" style="flex-direction:column">
+            <button class="btn btn-p btn-lg btn-block" data-go="vente">Nouvelle vente</button>
+            <button class="btn btn-g btn-block">Réimprimer (même ticket)</button>
+            <button class="btn btn-g btn-block" data-go="historique">Historique du jour</button>
+            <button class="btn btn-g btn-block" data-go="shift-close">Clôturer le shift</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-resultat-fail" data-g="caisse">
+        <div class="result">
+          <div class="badge fail">!</div>
+          <h2 class="title">Facture OK · print échoué</h2>
+          <p class="sub">Échec d’impression n’invalide pas la FN. Réessayer sans recréer de facture.</p>
+          <div class="pills">
+            <span class="pill ok">Fiscal (FN) : OK</span>
+            <span class="pill bad">Impression : Échec</span>
+          </div>
+          <div class="row-actions" style="flex-direction:column">
+            <button class="btn btn-p btn-lg btn-block">Réessayer l’impression</button>
+            <button class="btn btn-g btn-block">Réimprimer plus tard</button>
+            <button class="btn btn-g btn-block" data-go="vente">Nouvelle vente</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-historique" data-g="caisse">
+        <h2 class="title">Historique du jour</h2>
+        <p class="sub">Caisse 1 · Marie · aujourd’hui. Le caissier ne crée pas l’avoir lui-même : il envoie une demande à l’admin.</p>
+        <div class="toast-ok" id="avoir-toast">Demande d’avoir envoyée à l’admin. Elle apparaîtra dans Suivi → Avoirs.</div>
+        <div class="list">
+          <div class="list-row">
+            <div>
+              <strong>2 000 F</strong>
+              <div class="meta-line">Espèces · 10:42 · FN #FN-1042</div>
+            </div>
+            <div style="text-align:right">
+              <span class="tag">FN OK</span>
+              <span class="tag">Print</span>
+              <div class="avoir-actions">
+                <button class="btn btn-g" style="padding:6px 10px;font-size:0.72rem">Réimprimer</button>
+                <button class="btn btn-g" style="padding:6px 10px;font-size:0.72rem" data-go="avoir-demande" data-fn="FN-1042">Demander un avoir</button>
+              </div>
+            </div>
+          </div>
+          <div class="list-row">
+            <div>
+              <strong>3 500 F</strong>
+              <div class="meta-line">MoMo · 09:18 · FN #FN-1038</div>
+            </div>
+            <div style="text-align:right">
+              <span class="tag">FN OK</span>
+              <span class="tag fail">Print</span>
+              <div class="avoir-actions">
+                <button class="btn btn-g" style="padding:6px 10px;font-size:0.72rem">Réessayer</button>
+                <button class="btn btn-g" style="padding:6px 10px;font-size:0.72rem" disabled>Avoir demandé</button>
+              </div>
+              <div class="meta-line" style="margin-top:4px">En attente admin</div>
+            </div>
+          </div>
+        </div>
+        <div class="row-actions">
+          <button class="btn btn-g" data-go="vente">Retour vente</button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-avoir-demande" data-g="caisse">
+        <div class="form-card">
+          <h2 class="title">Demande d’avoir total</h2>
+          <p class="sub">Annulation complète de la FN. Vous ne créez pas l’avoir : l’admin valide ou refuse dans le Suivi.</p>
+          <div class="list" style="margin-bottom:12px">
+            <div class="list-row"><span>Facture liée</span><span>FN #FN-1042 · 2 000 F</span></div>
+            <div class="list-row"><span>Type</span><span>Avoir total</span></div>
+            <div class="list-row"><span>Caissier</span><span>Marie</span></div>
+          </div>
+          <div class="field">
+            <label>Motif de la demande *</label>
+            <textarea placeholder="Ex. Erreur article, retour client…"></textarea>
+          </div>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="historique">Annuler</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" id="btn-send-avoir" data-go="historique">Envoyer à l’admin</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-shift-close" data-g="caisse">
+        <div class="form-card">
+          <h2 class="title">Clôturer le shift</h2>
+          <p class="sub">Fin de service · autre caissier peut reprendre le même device.</p>
+          <div class="split">
+            <div class="stat"><span class="eyebrow">Ventes</span><b>12</b></div>
+            <div class="stat"><span class="eyebrow">Total</span><b>48 200 F</b></div>
+            <div class="stat"><span class="eyebrow">Espèces attendu</span><b>22 000 F</b></div>
+            <div class="stat"><span class="eyebrow">Compté</span><input value="22 000" style="margin-top:6px;font-weight:600;font-size:1.1rem;border:1px solid var(--line);border-radius:8px;padding:8px;width:100%;background:#fff" /></div>
+          </div>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="vente">Annuler</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="pin">Clôturer · Écran PIN</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== ADMIN ========== -->
+      <section class="screen" id="s-admin-gate" data-g="admin">
+        <div class="form-card">
+          <h2 class="title">Accès Paramètres</h2>
+          <p class="sub">Saisissez le <strong>PIN owner</strong> défini au premier onboarding (ou modifié dans Caissiers & PIN).</p>
+          <div class="field"><label>PIN owner</label><input type="password" maxlength="4" placeholder="••••" /></div>
+          <p class="field-hint">Ce n’est pas le PIN caissier. En cas d’oubli : reconnexion admin (email / mot de passe).</p>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="vente">Retour caisse</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="admin">Entrer</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-admin" data-g="admin">
+        <h2 class="title">Paramètres</h2>
+        <p class="sub">Configuration et suivi · pas accessible au caissier standard.</p>
+        <div class="notif" id="admin-avoir-notif">
+          <div>
+            <strong>2 demandes d’avoir</strong> en attente (Marie · FN #FN-1038, FN #FN-1042).
+            <a href="#" data-go="suivi" data-open-panel="avoirs">Traiter dans Suivi → Avoirs</a>
+          </div>
+        </div>
+        <div class="tiles">
+          <button class="tile" data-go="entreprise"><div class="ico">◎</div><strong>Compte & entreprise</strong><span>Infos entreprise</span></button>
+          <button class="tile" data-go="fn"><div class="ico">▣</div><strong>Factures normalisées</strong><span>Config fiscale DGI</span></button>
+          <button class="tile" data-go="magasin"><div class="ico">▤</div><strong>Points de caisse</strong><span>Caisse 1, Comptoir…</span></button>
+          <button class="tile" data-go="caissiers"><div class="ico">☺</div><strong>Caissiers & PIN</strong><span>PIN owner + caissiers</span></button>
+          <button class="tile" data-go="produits"><div class="ico">+</div><strong>Produits & services</strong><span>Prix + groupe taxation FN</span></button>
+          <button class="tile" data-go="clients-admin"><div class="ico">✉</div><strong>Clients</strong><span>Ajout si besoin</span></button>
+          <button class="tile" data-go="imprimante"><div class="ico">⎙</div><strong>Imprimante</strong><span>BT / USB-LAN + test</span></button>
+          <button class="tile" data-go="suivi"><div class="ico">☰</div><strong>Suivi du jour</strong><span>Période · caissier · avoirs</span></button>
+          <button class="tile" data-go="bind"><div class="ico">⌀</div><strong>Device</strong><span>Attacher / détacher</span></button>
+        </div>
+        <div class="row-actions">
+          <button class="btn btn-g" data-go="vente">Retour caisse</button>
+          <button class="btn btn-d" data-go="pin">Quitter · PIN</button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-caissiers" data-g="admin">
+        <h2 class="title">Caissiers & PIN</h2>
+        <p class="sub">Le PIN owner (Paramètres) et les PIN caissiers se gèrent ici. Le PIN owner a été forcé au premier onboarding.</p>
+
+        <div class="form-card" style="max-width:100%;margin-bottom:14px;border:1px solid rgba(7,137,66,.25)">
+          <p class="eyebrow">PIN owner · Accès Paramètres</p>
+          <div class="list" style="margin-bottom:10px">
+            <div class="list-row">
+              <div><strong>Adjoa Mensah</strong><br /><span style="font-size:0.75rem;color:var(--muted)">Owner · PIN ····</span></div>
+              <span class="tag">Owner</span>
+            </div>
+          </div>
+          <div class="split">
+            <div class="field" style="margin:0">
+              <label>Nouveau PIN owner (4 chiffres)</label>
+              <input maxlength="4" inputmode="numeric" placeholder="••••" />
+            </div>
+            <div class="field" style="margin:0">
+              <label>Confirmer</label>
+              <input maxlength="4" inputmode="numeric" placeholder="••••" />
+            </div>
+          </div>
+          <button type="button" class="btn btn-p" style="margin-top:10px;padding:10px 14px;font-size:0.8rem">Modifier le PIN owner</button>
+        </div>
+
+        <p class="eyebrow">Caissiers</p>
+        <div class="list">
+          <div class="list-row"><div><strong>Marie</strong><br /><span style="font-size:0.75rem;color:var(--muted)">PIN caissier ····</span></div><span class="tag">Actif</span></div>
+          <div class="list-row"><div><strong>Amadou</strong><br /><span style="font-size:0.75rem;color:var(--muted)">PIN caissier ····</span></div><span class="tag">Actif</span></div>
+          <div class="list-row"><div><strong>Paul</strong><br /><span style="font-size:0.75rem;color:var(--muted)">Désactivé</span></div><span class="tag off">Inactif</span></div>
+        </div>
+        <div class="row-actions">
+          <button class="btn btn-g" data-go="admin">Retour</button>
+          <span class="spacer"></span>
+          <button class="btn btn-p">+ Caissier</button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-produits" data-g="admin">
+        <h2 class="title">Produits & services</h2>
+        <p class="sub">Le groupe de taxation FN est défini à l’avance. Il n’affecte pas le prix saisi ; en caisse, le caissier ne le choisit plus.</p>
+
+        <div class="form-card" style="max-width:100%;margin-bottom:16px">
+          <p class="eyebrow">Exemple · Ajouter un produit / service</p>
+          <div class="split">
+            <div class="field" style="margin:0">
+              <label>Type</label>
+              <select>
+                <option selected>Produit</option>
+                <option>Service</option>
+              </select>
+            </div>
+            <div class="field" style="margin:0">
+              <label>Nom</label>
+              <input value="Eau 1,5 L" />
+            </div>
+          </div>
+          <div class="split" style="margin-top:12px">
+            <div class="field" style="margin:0">
+              <label>Prix de vente (FCFA)</label>
+              <input value="400" inputmode="numeric" />
+              <span class="field-hint">Prix TTC affiché en caisse. Indépendant du groupe de taxation.</span>
+            </div>
+            <div class="field" style="margin:0">
+              <label>Groupe de taxation FN</label>
+              <select>
+                <option value="A">A · EXONERE (0 %)</option>
+                <option value="B" selected>B · TAXABLE 18 %</option>
+                <option value="D">D · TVA REGIME D'EXCEPTION 18 %</option>
+                <option value="E">E · REGIME TPS</option>
+                <option value="F">F · RESERVE</option>
+              </select>
+              <span class="field-hint">Spécification fiscale DGI liée à l’article. Ne modifie pas le prix.</span>
+            </div>
+          </div>
+          <div class="field" style="margin-top:12px">
+            <label>Référence / code-barres (optionnel)</label>
+            <input placeholder="SKU ou EAN" />
+          </div>
+          <div class="row-actions" style="padding-top:8px">
+            <button type="button" class="btn btn-g" data-go="admin">Annuler</button>
+            <span class="spacer"></span>
+            <button type="button" class="btn btn-p">Enregistrer</button>
+          </div>
+        </div>
+
+        <div class="drop" style="margin-bottom:12px">Import CSV / Excel (colonne groupe de taxation requise)</div>
+        <div class="list">
+          <div class="list-row"><span>Eau 1,5 L <span class="tg" style="margin-left:6px">[B]</span></span><span>400 F</span></div>
+          <div class="list-row"><span>Pain <span class="tg" style="margin-left:6px">[A]</span></span><span>150 F</span></div>
+          <div class="list-row"><span>Service livraison <span class="tg" style="margin-left:6px">[B]</span></span><span>1 000 F</span></div>
+        </div>
+        <div class="row-actions">
+          <button class="btn btn-g" data-go="admin">Retour</button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-clients-admin" data-g="admin">
+        <h2 class="title">Clients</h2>
+        <p class="sub">Ajout si besoin pour la vente.</p>
+        <div class="list">
+          <div class="list-row"><span>Koffi Assogba</span><span>01 22 33 44</span></div>
+        </div>
+        <div class="row-actions">
+          <button class="btn btn-g" data-go="admin">Retour</button>
+          <span class="spacer"></span>
+          <button class="btn btn-p">+ Client</button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-suivi" data-g="admin">
+        <h2 class="title">Suivi du jour</h2>
+        <p class="sub">Ventes, shifts, totaux et demandes d’avoir des caissiers.</p>
+
+        <div class="notif">
+          <div>
+            <strong>Notification</strong> · 2 demandes d’avoir en attente. Ouvrez l’onglet <em>Avoirs</em> pour valider ou refuser.
+          </div>
+        </div>
+
+        <div class="filters" id="suivi-filters" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr))">
+          <div class="field">
+            <label>Période · du</label>
+            <input type="date" id="f-date-from" value="2026-09-25" />
+          </div>
+          <div class="field">
+            <label>au</label>
+            <input type="date" id="f-date-to" value="2026-09-25" />
+          </div>
+          <div class="field">
+            <label>Caissier</label>
+            <select id="f-caissier">
+              <option value="all">Tous</option>
+              <option value="marie">Marie</option>
+              <option value="amadou">Amadou</option>
+            </select>
+          </div>
+        </div>
+        <p class="filter-summary" id="suivi-filter-summary">Période : 25/09/2026 → 25/09/2026 · tous caissiers</p>
+        <div class="row-actions" style="padding-top:0;margin-bottom:12px;margin-top:0">
+          <button type="button" class="btn btn-g" style="padding:8px 12px;font-size:0.75rem" id="btn-reset-filters">Réinitialiser</button>
+        </div>
+
+        <div class="tabs" id="suivi-tabs">
+          <button type="button" class="tab on" data-panel="totaux">Totaux</button>
+          <button type="button" class="tab" data-panel="ventes">Ventes</button>
+          <button type="button" class="tab" data-panel="shifts">Shifts</button>
+          <button type="button" class="tab" data-panel="avoirs">Avoirs <span class="tag" style="margin-left:4px">2</span></button>
+        </div>
+
+        <div class="suivi-panel on" id="panel-totaux">
+          <div class="split" style="margin-bottom:14px" id="suivi-stats">
+            <div class="stat"><span class="eyebrow">Transactions</span><b data-k="tx">5</b></div>
+            <div class="stat"><span class="eyebrow">CA période</span><b data-k="ca">29 850 F</b></div>
+            <div class="stat"><span class="eyebrow">Espèces</span><b data-k="especes">3 150 F</b></div>
+            <div class="stat"><span class="eyebrow">Mobile Money</span><b data-k="momo">3 500 F</b></div>
+            <div class="stat"><span class="eyebrow">Carte / autre</span><b data-k="autre">23 200 F</b></div>
+            <div class="stat"><span class="eyebrow">Avoirs en attente</span><b data-k="avoirs">2</b></div>
+          </div>
+        </div>
+
+        <div class="suivi-panel" id="panel-ventes">
+          <div class="list" id="suivi-ventes">
+            <div class="list-row" data-caissier="marie" data-pay="especes" data-print="ok">
+              <div>
+                <strong>2 000 F</strong>
+                <div class="meta-line">10:42 · Marie · Caisse 1 · Espèces · Client défaut</div>
+              </div>
+              <div style="text-align:right">
+                <span class="tag">FN OK</span>
+                <span class="tag">Print</span>
+              </div>
+            </div>
+            <div class="list-row" data-caissier="marie" data-pay="momo" data-print="fail">
+              <div>
+                <strong>3 500 F</strong>
+                <div class="meta-line">09:18 · Marie · Caisse 1 · Mobile Money · Koffi Assogba</div>
+              </div>
+              <div style="text-align:right">
+                <span class="tag">FN OK</span>
+                <span class="tag fail">Print</span>
+              </div>
+            </div>
+            <div class="list-row" data-caissier="amadou" data-pay="carte" data-print="ok">
+              <div>
+                <strong>8 200 F</strong>
+                <div class="meta-line">08:05 · Amadou · Caisse 1 · Carte · Boutique Les Palmiers</div>
+              </div>
+              <div style="text-align:right">
+                <span class="tag">FN OK</span>
+                <span class="tag">Print</span>
+              </div>
+            </div>
+            <div class="list-row" data-caissier="amadou" data-pay="especes" data-print="ok">
+              <div>
+                <strong>1 150 F</strong>
+                <div class="meta-line">11:02 · Amadou · Comptoir · Espèces · Client défaut</div>
+              </div>
+              <div style="text-align:right">
+                <span class="tag">FN OK</span>
+                <span class="tag">Print</span>
+              </div>
+            </div>
+            <div class="list-row" data-caissier="marie" data-pay="virement" data-print="fail">
+              <div>
+                <strong>15 000 F</strong>
+                <div class="meta-line">07:40 · Marie · Caisse 1 · Virement</div>
+              </div>
+              <div style="text-align:right">
+                <span class="tag">FN OK</span>
+                <span class="tag fail">Print</span>
+              </div>
+            </div>
+          </div>
+          <p class="field-hint" id="suivi-ventes-empty" style="display:none;margin-top:10px">Aucune vente pour ces filtres.</p>
+        </div>
+
+        <div class="suivi-panel" id="panel-shifts">
+          <div class="list" id="suivi-shifts">
+            <div class="list-row" data-caissier="marie" data-shift="open">
+              <div>
+                <strong>Marie · Caisse 1</strong>
+                <div class="meta-line">Ouvert 08:30 · fond 5 000 F · ventes 12 · 48 200 F</div>
+              </div>
+              <span class="tag">Ouvert</span>
+            </div>
+            <div class="list-row" data-caissier="amadou" data-shift="closed">
+              <div>
+                <strong>Amadou · Caisse 1</strong>
+                <div class="meta-line">07:00 → 08:25 · fond 3 000 · compté 22 000 · écart 0</div>
+              </div>
+              <span class="tag off">Clôturé</span>
+            </div>
+            <div class="list-row" data-caissier="amadou" data-shift="closed">
+              <div>
+                <strong>Amadou · Comptoir</strong>
+                <div class="meta-line">Hier 14:00 → 19:10 · CA 31 800 F</div>
+              </div>
+              <span class="tag off">Clôturé</span>
+            </div>
+          </div>
+          <p class="field-hint" id="suivi-shifts-empty" style="display:none;margin-top:10px">Aucun shift pour ces filtres.</p>
+        </div>
+
+        <div class="suivi-panel" id="panel-avoirs">
+          <p class="field-hint" style="margin-bottom:10px">Avoir total uniquement. L’admin clique sur Valider (émission FN avoir) ou Refuser.</p>
+          <div class="list" id="suivi-avoirs">
+            <div class="list-row" data-caissier="marie">
+              <div>
+                <strong>Demande · FN #FN-1038 · 3 500 F</strong>
+                <div class="meta-line">Marie · 09:25 · Motif : retour client · Avoir total</div>
+              </div>
+              <div style="text-align:right">
+                <span class="tag" style="background:#fff8e8;color:var(--warn)">En attente</span>
+                <div class="avoir-actions">
+                  <button type="button" class="btn btn-p btn-avoir-ok" style="padding:6px 10px;font-size:0.72rem">Valider</button>
+                  <button type="button" class="btn btn-d btn-avoir-no" style="padding:6px 10px;font-size:0.72rem">Refuser</button>
+                </div>
+              </div>
+            </div>
+            <div class="list-row" data-caissier="marie">
+              <div>
+                <strong>Demande · FN #FN-1042 · 2 000 F</strong>
+                <div class="meta-line">Marie · 10:50 · Motif : erreur article · Avoir total</div>
+              </div>
+              <div style="text-align:right">
+                <span class="tag" style="background:#fff8e8;color:var(--warn)">En attente</span>
+                <div class="avoir-actions">
+                  <button type="button" class="btn btn-p btn-avoir-ok" style="padding:6px 10px;font-size:0.72rem">Valider</button>
+                  <button type="button" class="btn btn-d btn-avoir-no" style="padding:6px 10px;font-size:0.72rem">Refuser</button>
+                </div>
+              </div>
+            </div>
+            <div class="list-row" data-caissier="amadou">
+              <div>
+                <strong>Avoir total émis · AV #AV-012 · FN #FN-0991</strong>
+                <div class="meta-line">Amadou · hier · Validé owner · −1 200 F</div>
+              </div>
+              <div style="text-align:right">
+                <span class="tag">Validé</span>
+                <div class="avoir-actions">
+                  <button class="btn btn-g" style="padding:6px 10px;font-size:0.72rem">Réimprimer</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row-actions">
+          <button class="btn btn-g" data-go="admin">Retour</button>
+        </div>
+      </section>
+    </div>
+
+  </div>
+
+  <script>
+    const SCREENS = {
+      onb: [
+        ["welcome", "Accueil"],
+        ["compte", "Compte"],
+        ["login", "Login"],
+        ["entreprise", "Entreprise"],
+        ["fn", "FN intro"],
+        ["fn1", "FN 1"],
+        ["fn2", "FN 2"],
+        ["fn3", "FN 3"],
+        ["fn4", "FN 4"],
+        ["fn-ok", "FN OK"],
+        ["fn-manuel", "FN manuel"],
+        ["magasin", "Magasin"],
+        ["catalogue-setup", "Catalogue"],
+        ["imprimante", "Imprimante"],
+        ["bind", "Device"],
+      ],
+      caisse: [
+        ["pin", "PIN"],
+        ["shift-open", "Shift ↑"],
+        ["vente", "Vente"],
+        ["paiement", "Paiement"],
+        ["resultat-ok", "OK"],
+        ["resultat-fail", "Print ✗"],
+        ["historique", "Histo"],
+        ["avoir-demande", "Demande avoir"],
+        ["shift-close", "Shift ↓"],
+      ],
+      admin: [
+        ["admin-gate", "Gate"],
+        ["admin", "Hub"],
+        ["caissiers", "Caissiers"],
+        ["produits", "Produits"],
+        ["clients-admin", "Clients"],
+        ["suivi", "Suivi"],
+      ],
+    };
+
+    const CTX = {
+      welcome: "Premier démarrage",
+      compte: "Onboarding · compte",
+      login: "Onboarding · login",
+      entreprise: "Onboarding · entreprise",
+      fn: "Onboarding · FN intro",
+      fn1: "FN · Étape 1/4 Demande",
+      fn2: "FN · Étape 2/4 Validation",
+      fn3: "FN · Étape 3/4 NIM",
+      fn4: "FN · Étape 4/4 Jeton",
+      "fn-ok": "FN · Activée",
+      "fn-manuel": "FN · Config manuelle",
+      magasin: "Onboarding · magasin",
+      "catalogue-setup": "Onboarding · catalogue",
+      imprimante: "Config imprimante",
+      bind: "Rattachement device",
+      pin: "Mini Marché · Caisse 1",
+      "shift-open": "Marie · ouverture",
+      vente: "Marie · encaissement",
+      paiement: "Marie · paiement",
+      "resultat-ok": "Marie · succès",
+      "resultat-fail": "Marie · print échoué",
+      historique: "Marie · historique",
+      "avoir-demande": "Marie · demande avoir",
+      "shift-close": "Marie · clôture",
+      "admin-gate": "Accès admin",
+      admin: "Mode Paramètres",
+      caissiers: "Admin · caissiers",
+      produits: "Admin · catalogue",
+      "clients-admin": "Admin · clients",
+      suivi: "Admin · suivi",
+    };
+
+    function buildNav() {
+      for (const [g, items] of Object.entries(SCREENS)) {
+        const el = document.getElementById("nav-" + g);
+        items.forEach(([id, label], i) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.textContent = label;
+          b.dataset.go = id;
+          if (id === "welcome") b.classList.add("active");
+          el.appendChild(b);
+        });
+      }
+    }
+
+    function openSuiviPanel(panel) {
+      if (!panel) return;
+      document.querySelectorAll("#suivi-tabs .tab").forEach((t) => {
+        t.classList.toggle("on", t.dataset.panel === panel);
+      });
+      document.querySelectorAll(".suivi-panel").forEach((p) => {
+        p.classList.toggle("on", p.id === "panel-" + panel);
+      });
+    }
+
+    function show(id) {
+      document.querySelectorAll(".screen").forEach((s) => {
+        s.classList.toggle("active", s.id === "s-" + id);
+      });
+      document.querySelectorAll(".nav button").forEach((b) => {
+        b.classList.toggle("active", b.dataset.go === id);
+      });
+      document.getElementById("chrome-ctx").textContent = CTX[id] || "";
+      const printDot = document.getElementById("print-dot");
+      printDot.className = "dot" + (id === "resultat-fail" ? " bad" : "");
+      const screen = document.getElementById("s-" + id);
+      const gear = document.getElementById("btn-chrome-gear");
+      if (gear) gear.classList.toggle("show", screen?.dataset.g === "caisse");
+    }
+
+    buildNav();
+    document.body.addEventListener("click", (e) => {
+      const t = e.target.closest("[data-go]");
+      if (!t) return;
+      e.preventDefault();
+      show(t.dataset.go);
+      if (t.dataset.go === "suivi") openSuiviPanel(t.dataset.openPanel || "totaux");
+    });
+
+    document.getElementById("btn-send-avoir")?.addEventListener("click", () => {
+      setTimeout(() => {
+        document.getElementById("avoir-toast")?.classList.add("show");
+      }, 50);
+    });
+
+    document.getElementById("suivi-avoirs")?.addEventListener("click", (e) => {
+      const ok = e.target.closest(".btn-avoir-ok");
+      const no = e.target.closest(".btn-avoir-no");
+      if (!ok && !no) return;
+      const row = e.target.closest(".list-row");
+      if (!row) return;
+      const tag = row.querySelector(".tag");
+      const actions = row.querySelector(".avoir-actions");
+      if (ok) {
+        if (tag) { tag.textContent = "Validé"; tag.style.background = ""; tag.style.color = ""; tag.className = "tag"; }
+        if (actions) actions.innerHTML = '<button class="btn btn-g" style="padding:6px 10px;font-size:0.72rem">Réimprimer</button>';
+        const title = row.querySelector("strong");
+        if (title) title.textContent = title.textContent.replace("Demande", "Avoir total émis");
+      } else {
+        if (tag) { tag.textContent = "Refusé"; tag.className = "tag fail"; tag.style.background = ""; tag.style.color = ""; }
+        if (actions) actions.innerHTML = "";
+      }
+      applySuiviFilters();
+    });
+    document.getElementById("prod-search")?.addEventListener("input", (e) => {
+      const q = (e.target.value || "").trim().toLowerCase();
+      const items = document.querySelectorAll("#prod-grid .prod");
+      let visible = 0;
+      items.forEach((p) => {
+        const ok = !q || (p.dataset.name || "").includes(q);
+        p.style.display = ok ? "" : "none";
+        if (ok) visible += 1;
+      });
+      const empty = document.getElementById("prod-empty");
+      const hint = document.getElementById("prod-search-hint");
+      if (empty) empty.style.display = visible ? "none" : "block";
+      if (hint) {
+        hint.textContent = q
+          ? (visible ? `${visible} résultat${visible > 1 ? "s" : ""} pour « ${e.target.value.trim()} »` : "Aucun résultat.")
+          : "Tapez pour filtrer le catalogue (ex. « eau », « pain »).";
+      }
+    });
+
+    document.getElementById("btn-add-client")?.addEventListener("click", () => {
+      document.getElementById("client-add")?.classList.toggle("show");
+    });
+    document.getElementById("btn-save-client")?.addEventListener("click", () => {
+      const box = document.getElementById("client-add");
+      const name = box?.querySelector('input[placeholder="Nom du client"]')?.value?.trim();
+      const phone = box?.querySelectorAll("input")[1]?.value?.trim() || "";
+      if (!name) return;
+      const sel = document.getElementById("client-select");
+      const opt = document.createElement("option");
+      opt.value = "new-" + Date.now();
+      opt.textContent = phone ? `${name} · ${phone}` : name;
+      opt.selected = true;
+      sel.appendChild(opt);
+      box.classList.remove("show");
+      box.querySelectorAll("input").forEach((i) => (i.value = ""));
+    });
+    let pin = "";
+    const dots = [...document.querySelectorAll("#pin-dots i")];
+    document.getElementById("pad").addEventListener("click", (e) => {
+      const k = e.target.closest("[data-k]")?.dataset.k;
+      if (!k) return;
+      if (k === "c") pin = pin.slice(0, -1);
+      else if (k === "ok") { if (pin.length === 4) show("shift-open"); return; }
+      else if (pin.length < 4) pin += k;
+      dots.forEach((d, i) => d.classList.toggle("on", i < pin.length));
+    });
+
+    document.getElementById("pays").addEventListener("click", (e) => {
+      const p = e.target.closest(".pay");
+      if (!p) return;
+      document.querySelectorAll(".pay").forEach((x) => x.classList.remove("on"));
+      p.classList.add("on");
+    });
+
+    document.getElementById("suivi-tabs")?.addEventListener("click", (e) => {
+      const tab = e.target.closest(".tab[data-panel]");
+      if (!tab) return;
+      document.querySelectorAll("#suivi-tabs .tab").forEach((t) => t.classList.toggle("on", t === tab));
+      document.querySelectorAll(".suivi-panel").forEach((p) => {
+        p.classList.toggle("on", p.id === "panel-" + tab.dataset.panel);
+      });
+    });
+
+    function formatDateFr(iso) {
+      if (!iso) return "…";
+      const [y, m, d] = iso.split("-");
+      return `${d}/${m}/${y}`;
+    }
+    function applySuiviFilters() {
+      const caissier = document.getElementById("f-caissier")?.value || "all";
+      const from = document.getElementById("f-date-from")?.value;
+      const to = document.getElementById("f-date-to")?.value;
+
+      const summary = document.getElementById("suivi-filter-summary");
+      if (summary) {
+        const who = document.getElementById("f-caissier")?.selectedOptions?.[0]?.textContent || "Tous";
+        summary.textContent = `Période : ${formatDateFr(from)} → ${formatDateFr(to)} · ${who}`;
+      }
+
+      let visibleTx = 0;
+      let ca = 0;
+      let especes = 0;
+      let momo = 0;
+      let autre = 0;
+
+      document.querySelectorAll("#suivi-ventes .list-row").forEach((row) => {
+        const ok = caissier === "all" || row.dataset.caissier === caissier;
+        row.style.display = ok ? "" : "none";
+        if (!ok) return;
+        visibleTx += 1;
+        const amount = parseInt((row.querySelector("strong")?.textContent || "0").replace(/\D/g, ""), 10) || 0;
+        ca += amount;
+        if (row.dataset.pay === "especes") especes += amount;
+        else if (row.dataset.pay === "momo") momo += amount;
+        else autre += amount;
+      });
+      const ventesEmpty = document.getElementById("suivi-ventes-empty");
+      if (ventesEmpty) ventesEmpty.style.display = visibleTx ? "none" : "block";
+
+      let shiftVisible = 0;
+      document.querySelectorAll("#suivi-shifts .list-row").forEach((row) => {
+        const ok = caissier === "all" || row.dataset.caissier === caissier;
+        row.style.display = ok ? "" : "none";
+        if (ok) shiftVisible += 1;
+      });
+      const shiftsEmpty = document.getElementById("suivi-shifts-empty");
+      if (shiftsEmpty) shiftsEmpty.style.display = shiftVisible ? "none" : "block";
+
+      let avoirPending = 0;
+      document.querySelectorAll("#suivi-avoirs .list-row").forEach((row) => {
+        const ok = caissier === "all" || row.dataset.caissier === caissier;
+        row.style.display = ok ? "" : "none";
+        if (ok && row.querySelector(".tag")?.textContent?.includes("attente")) avoirPending += 1;
+      });
+
+      const fmt = (n) => n.toLocaleString("fr-FR") + " F";
+      const setStat = (k, v) => {
+        const el = document.querySelector(`#suivi-stats [data-k="${k}"]`);
+        if (el) el.textContent = v;
+      };
+      setStat("tx", String(visibleTx));
+      setStat("ca", fmt(ca));
+      setStat("especes", fmt(especes));
+      setStat("momo", fmt(momo));
+      setStat("autre", fmt(autre));
+      setStat("avoirs", String(avoirPending));
+    }
+
+    document.getElementById("suivi-filters")?.addEventListener("change", applySuiviFilters);
+    document.getElementById("btn-reset-filters")?.addEventListener("click", () => {
+      const from = document.getElementById("f-date-from");
+      const to = document.getElementById("f-date-to");
+      const caissier = document.getElementById("f-caissier");
+      if (from) from.value = "2026-09-25";
+      if (to) to.value = "2026-09-25";
+      if (caissier) caissier.value = "all";
+      applySuiviFilters();
+    });
+    applySuiviFilters();
+  </script>
+</body>
+</html>
