@@ -25,6 +25,9 @@
   .detail { color:var(--gris); font-size:13px; margin-top:4px; }
   #journal { font:13px/1.5 ui-monospace,Menlo,Consolas,monospace; background:#111827; color:#e5e7eb; border-radius:8px; padding:10px; height:220px; overflow:auto; white-space:pre-wrap; }
   .j-ok { color:#86efac; } .j-ko { color:#fca5a5; }
+  a.bouton { display:inline-block; padding:9px 14px; border-radius:8px; background:var(--vert); color:#fff; text-decoration:none; font-weight:600; }
+  .etapes { margin:10px 0 0; padding-left:20px; color:#374151; }
+  .etapes li { margin-bottom:4px; }
   .masque { display:none; }
 </style>
 </head>
@@ -37,6 +40,21 @@
     <h2>1. Connexion</h2>
     <div id="etat" class="etat"><span class="pastille"></span><span id="etat-texte">Recherche…</span></div>
     <div id="etat-detail" class="detail"></div>
+  </section>
+
+  <section id="bloc-telechargement" class="masque">
+    <h2>Installer Kudizy Print Connector</h2>
+    <div id="telechargement-windows">
+      <p class="detail">Ce petit programme permet à la caisse d'imprimer sur ce PC. Il est à installer une seule fois.</p>
+      <p><a id="lien-telechargement" class="bouton" download>Télécharger le Print Connector (Windows)</a></p>
+      <ol class="etapes">
+        <li>Si le navigateur signale un fichier « rarement téléchargé », choisissez <b>Conserver</b>.</li>
+        <li>Ouvrez le fichier téléchargé.</li>
+        <li>Si Windows affiche « Windows a protégé votre ordinateur », cliquez sur <b>Informations complémentaires</b>, puis sur <b>Exécuter quand même</b>.</li>
+        <li>L'icône Kudizy apparaît près de l'horloge. Cette page la détecte toute seule, sans recharger.</li>
+      </ol>
+    </div>
+    <p id="telechargement-autre" class="detail masque">Le Print Connector fonctionne sur PC Windows. Sur téléphone ou tablette Android, ouvrez cette page dans l'application Kudizy.</p>
   </section>
 
   <section id="bloc-association" class="masque">
@@ -78,8 +96,26 @@
 <script>
 const CONNECTEUR = "http://127.0.0.1:9420";
 const CLE_JETON = "kz_token";
+const TELECHARGEMENT = "https://kudizy.github.io/pos-simulation/print-test/kudizy-print-connector.exe";
 const $ = (id) => document.getElementById(id);
 const android = window.KudizyPrint || null;
+const windows = /Windows/i.test(navigator.userAgent);
+let attente = null;
+
+// Tant que le connecteur est introuvable, on réessaie toutes les 3 secondes.
+function proposerTelechargement(afficher) {
+  $("bloc-telechargement").classList.toggle("masque", !afficher);
+  if (afficher && !attente) {
+    $("lien-telechargement").href = TELECHARGEMENT;
+    $("telechargement-windows").classList.toggle("masque", !windows);
+    $("telechargement-autre").classList.toggle("masque", windows);
+    attente = setInterval(rafraichir, 3000);
+  } else if (!afficher && attente) {
+    clearInterval(attente);
+    attente = null;
+    journal("Connecteur détecté", true);
+  }
+}
 
 function journal(texte, ok) {
   const l = document.createElement("div");
@@ -169,11 +205,15 @@ async function rafraichir() {
     s = await appel("GET", "/status");
   } catch (e) {
     afficherEtat(false, "Connecteur introuvable",
-      "Vérifiez que Kudizy Print Connector est lancé (icône près de l'horloge) et que cette page est ouverte depuis une adresse autorisée.");
+      windows
+        ? "Kudizy Print Connector n'est pas lancé sur ce PC. S'il a déjà été téléchargé, ouvrez à nouveau le fichier kudizy-print-connector.exe (dossier Téléchargements). Sinon, téléchargez-le ci-dessous."
+        : "Aucun Print Connector sur cet appareil.");
     $("bloc-association").classList.add("masque");
     $("bloc-imprimante").classList.add("masque");
+    proposerTelechargement(true);
     return;
   }
+  proposerTelechargement(false);
   if (!s.version) {
     afficherEtat(false, "Accès refusé", s.message || "Adresse de la page non autorisée par le connecteur.");
     return;
