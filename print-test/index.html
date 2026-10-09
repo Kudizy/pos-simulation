@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kudizy – Test d'impression</title>
+<style>
+  :root { --vert:#078942; --rouge:#c62828; --gris:#6b7280; --bord:#e5e7eb; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:#f6f7f9; color:#111827; }
+  main { max-width:720px; margin:0 auto; padding:20px 16px 40px; }
+  h1 { font-size:20px; margin:0 0 4px; }
+  .sous-titre { color:var(--gris); margin:0 0 18px; }
+  section { background:#fff; border:1px solid var(--bord); border-radius:10px; padding:14px 16px; margin-bottom:14px; }
+  h2 { font-size:15px; margin:0 0 10px; }
+  .ligne { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  input, select { font:inherit; padding:8px 10px; border:1px solid #d1d5db; border-radius:8px; min-width:0; }
+  input.code { width:120px; letter-spacing:4px; text-align:center; }
+  button { font:inherit; padding:9px 14px; border:0; border-radius:8px; background:var(--vert); color:#fff; cursor:pointer; }
+  button.secondaire { background:#fff; color:#111827; border:1px solid #d1d5db; }
+  button:disabled { opacity:.5; cursor:default; }
+  .etat { display:flex; align-items:center; gap:8px; font-weight:600; }
+  .pastille { width:12px; height:12px; border-radius:50%; background:#9ca3af; }
+  .ok .pastille { background:var(--vert); } .ko .pastille { background:var(--rouge); }
+  .detail { color:var(--gris); font-size:13px; margin-top:4px; }
+  #journal { font:13px/1.5 ui-monospace,Menlo,Consolas,monospace; background:#111827; color:#e5e7eb; border-radius:8px; padding:10px; height:220px; overflow:auto; white-space:pre-wrap; }
+  .j-ok { color:#86efac; } .j-ko { color:#fca5a5; }
+  .masque { display:none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Test d'impression Kudizy</h1>
+  <p class="sous-titre">Vérifie que la caisse imprime bien sur ce poste, sans passer par l'application.</p>
+
+  <section>
+    <h2>1. Connexion</h2>
+    <div id="etat" class="etat"><span class="pastille"></span><span id="etat-texte">Recherche…</span></div>
+    <div id="etat-detail" class="detail"></div>
+  </section>
+
+  <section id="bloc-association" class="masque">
+    <h2>2. Associer cette page au connecteur</h2>
+    <p class="detail">Le code à 6 chiffres s'affiche en cliquant sur l'icône Kudizy près de l'horloge Windows.</p>
+    <div class="ligne">
+      <input id="code" class="code" inputmode="numeric" maxlength="6" placeholder="000000">
+      <button id="btn-associer">Associer</button>
+    </div>
+  </section>
+
+  <section id="bloc-imprimante" class="masque">
+    <h2>3. Choisir l'imprimante</h2>
+    <div class="ligne" style="margin-bottom:8px">
+      <select id="type"><option value="usb">USB</option><option value="network">Réseau (IP)</option></select>
+      <select id="usb"></select>
+      <input id="ip" class="masque" placeholder="192.168.1.50">
+      <button id="btn-imprimante">Enregistrer</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. Tests</h2>
+    <div class="ligne">
+      <button id="btn-test">Imprimer un ticket</button>
+      <button id="btn-double" class="secondaire">2 clics rapides</button>
+      <button id="btn-serie" class="secondaire">50 tickets</button>
+      <button id="btn-etat" class="secondaire">Vérifier l'état</button>
+    </div>
+    <div id="compteur" class="detail"></div>
+  </section>
+
+  <section>
+    <h2>Journal</h2>
+    <div id="journal"></div>
+  </section>
+</main>
+
+<script>
+const CONNECTEUR = "http://127.0.0.1:9420";
+const CLE_JETON = "kz_token";
+const $ = (id) => document.getElementById(id);
+const android = window.KudizyPrint || null;
+
+function journal(texte, ok) {
+  const l = document.createElement("div");
+  if (ok === true) l.className = "j-ok";
+  if (ok === false) l.className = "j-ko";
+  l.textContent = new Date().toLocaleTimeString("fr-FR") + "  " + texte;
+  $("journal").prepend(l);
+}
+
+function afficherEtat(ok, texte, detail) {
+  $("etat").className = "etat " + (ok ? "ok" : "ko");
+  $("etat-texte").textContent = texte;
+  $("etat-detail").textContent = detail || "";
+}
+
+async function appel(methode, chemin, corps) {
+  const entetes = { "Content-Type": "application/json" };
+  const jeton = localStorage.getItem(CLE_JETON);
+  if (jeton) entetes["X-Kudizy-Token"] = jeton;
+  const rep = await fetch(CONNECTEUR + chemin, {
+    method: methode,
+    headers: entetes,
+    body: corps ? JSON.stringify(corps) : undefined,
+  });
+  const donnees = await rep.json().catch(() => ({}));
+  if (donnees.error === "NOT_PAIRED" && chemin !== "/pair") {
+    localStorage.removeItem(CLE_JETON);
+    rafraichir();
+  }
+  return donnees;
+}
+
+// Ticket fictif au format attendu par le connecteur et par le pont Android.
+function ticketFictif(numero) {
+  return {
+    job_id: "test-" + Date.now() + "-" + numero,
+    width_mm: 80,
+    blocks: [
+      { type: "text", text: "MINI MARCHÉ DU PLATEAU", align: "center", bold: true, size: 2 },
+      { type: "text", text: "Avenue Chardy, Abidjan – Tél. 07 00 00 00 00", align: "center" },
+      { type: "separator" },
+      { type: "row", left: "Ticket n° " + numero, right: new Date().toLocaleString("fr-FR") },
+      { type: "separator" },
+      { type: "row", left: "Riz parfumé 5 kg", right: "4 500 F" },
+      { type: "row", left: "Huile 1 L x2", right: "2 400 F" },
+      { type: "row", left: "Eau minérale 1,5 L x6", right: "2 100 F" },
+      { type: "separator" },
+      { type: "row", left: "TOTAL", right: "9 000 F", bold: true },
+      { type: "row", left: "Espèces", right: "10 000 F" },
+      { type: "row", left: "Rendu", right: "1 000 F" },
+      { type: "feed", lines: 1 },
+      { type: "text", text: "Facture normalisée – code de vérification", align: "center" },
+      { type: "qr", data: "https://kudizy.com/verif/TEST-" + numero, size_mm: 30 },
+      { type: "text", text: "Merci de votre visite !", align: "center" },
+      { type: "cut" },
+    ],
+  };
+}
+
+// Point d'entrée unique : la PWA appellera la même fonction.
+async function imprimer(ticket) {
+  if (android) {
+    return JSON.parse(await android.print(JSON.stringify(ticket)));
+  }
+  return appel("POST", "/print", ticket);
+}
+
+function compteRendu(r, libelle) {
+  if (r.ok) journal(libelle + " : imprimé (" + r.job_id + ")", true);
+  else journal(libelle + " : " + (r.error || "ERREUR") + " – " + (r.message || "sans détail"), false);
+}
+
+async function rafraichir() {
+  if (android) {
+    $("bloc-association").classList.add("masque");
+    $("bloc-imprimante").classList.add("masque");
+    try {
+      const s = JSON.parse(await android.status());
+      afficherEtat(s.ready, s.ready ? "Application Android : imprimante prête" : "Application Android : imprimante non prête", s.message || s.printer || "");
+    } catch (e) {
+      afficherEtat(false, "Pont Android en erreur", String(e));
+    }
+    return;
+  }
+  let s;
+  try {
+    s = await appel("GET", "/status");
+  } catch (e) {
+    afficherEtat(false, "Connecteur introuvable",
+      "Vérifiez que Kudizy Print Connector est lancé (icône près de l'horloge) et que cette page est ouverte depuis une adresse autorisée.");
+    $("bloc-association").classList.add("masque");
+    $("bloc-imprimante").classList.add("masque");
+    return;
+  }
+  if (!s.version) {
+    afficherEtat(false, "Accès refusé", s.message || "Adresse de la page non autorisée par le connecteur.");
+    return;
+  }
+  $("bloc-association").classList.toggle("masque", s.paired);
+  $("bloc-imprimante").classList.toggle("masque", !s.paired);
+  if (!s.paired) {
+    afficherEtat(false, "Connecteur " + s.version + " trouvé, page non associée", "Saisissez le code d'association ci-dessous.");
+    return;
+  }
+  if (!s.printer) {
+    afficherEtat(false, "Associé – aucune imprimante choisie", "Choisissez l'imprimante à l'étape 3.");
+  } else {
+    const nom = s.printer.type === "network" ? s.printer.ip + ":" + s.printer.port : s.printer.name;
+    afficherEtat(s.printer.ready, (s.printer.ready ? "Prête : " : "Non prête : ") + nom, s.error ? s.error.message : "");
+  }
+  chargerUSB(s.printer);
+}
+
+async function chargerUSB(actuelle) {
+  const r = await appel("GET", "/printers");
+  const liste = $("usb");
+  liste.innerHTML = "";
+  (r.usb || []).forEach((nom) => {
+    const o = document.createElement("option");
+    o.value = o.textContent = nom;
+    liste.append(o);
+  });
+  if (!liste.options.length) liste.innerHTML = "<option value=''>Aucune imprimante USB installée</option>";
+  if (actuelle) {
+    $("type").value = actuelle.type;
+    if (actuelle.type === "usb") liste.value = actuelle.name;
+    else $("ip").value = actuelle.ip;
+    basculerType();
+  }
+}
+
+function basculerType() {
+  const reseau = $("type").value === "network";
+  $("usb").classList.toggle("masque", reseau);
+  $("ip").classList.toggle("masque", !reseau);
+}
+
+$("type").onchange = basculerType;
+
+$("btn-associer").onclick = async () => {
+  const r = await appel("POST", "/pair", { code: $("code").value.trim() });
+  if (r.ok) {
+    localStorage.setItem(CLE_JETON, r.token);
+    journal("Page associée au connecteur", true);
+    $("code").value = "";
+  } else {
+    journal("Association refusée : " + (r.message || r.error), false);
+  }
+  rafraichir();
+};
+
+$("btn-imprimante").onclick = async () => {
+  const corps = $("type").value === "network"
+    ? { type: "network", ip: $("ip").value.trim(), port: 9100 }
+    : { type: "usb", name: $("usb").value };
+  const r = await appel("POST", "/printer", corps);
+  if (r.error && !r.version) journal("Imprimante refusée : " + r.message, false);
+  else journal("Imprimante enregistrée", true);
+  rafraichir();
+};
+
+let numero = 1;
+
+$("btn-test").onclick = async () => {
+  const n = numero++;
+  compteRendu(await imprimer(ticketFictif(n)), "Ticket " + n);
+};
+
+// Deux envois du même ticket : un seul doit sortir.
+$("btn-double").onclick = async () => {
+  const n = numero++;
+  const t = ticketFictif(n);
+  const [a, b] = await Promise.all([imprimer(t), imprimer(t)]);
+  compteRendu(a, "Ticket " + n + " (1er clic)");
+  compteRendu(b, "Ticket " + n + " (2e clic)");
+  journal("Vérifiez qu'un seul ticket n° " + n + " est sorti.");
+};
+
+$("btn-serie").onclick = async () => {
+  const bouton = $("btn-serie");
+  bouton.disabled = true;
+  let reussis = 0, echecs = 0;
+  const debut = Date.now();
+  for (let i = 1; i <= 50; i++) {
+    const n = numero++;
+    const r = await imprimer(ticketFictif(n));
+    if (r.ok) reussis++; else { echecs++; compteRendu(r, "Ticket " + n); }
+    $("compteur").textContent = "Série : " + i + "/50 – " + reussis + " imprimés, " + echecs + " en échec";
+  }
+  const duree = ((Date.now() - debut) / 1000).toFixed(0);
+  journal("Série terminée en " + duree + " s : " + reussis + "/50 imprimés", echecs === 0);
+  bouton.disabled = false;
+};
+
+$("btn-etat").onclick = async () => {
+  await rafraichir();
+  journal("État : " + $("etat-texte").textContent + ($("etat-detail").textContent ? " – " + $("etat-detail").textContent : ""));
+};
+
+rafraichir();
+</script>
+</body>
+</html>
