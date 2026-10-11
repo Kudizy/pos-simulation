@@ -757,14 +757,119 @@
       <section class="screen" id="s-imprimante" data-g="onb">
         <div class="form-card">
           <h2 class="title">Imprimante 80 mm</h2>
-          <p class="sub">Bluetooth (Android) ou USB / LAN via Print Connector (desktop).</p>
-          <div class="list">
-            <div class="list-row"><span>Kudizy Certified TP-80</span><span class="tag">Sélectionnée</span></div>
-            <div class="list-row"><span>Connexion</span><span>Bluetooth / USB</span></div>
-            <div class="list-row"><span>Statut</span><span class="tag">Connectée</span></div>
+          <p class="sub">Sur quel appareil cette caisse est-elle utilisée ?</p>
+          <div class="tiles">
+            <button class="tile" data-go="imp-pc"><div class="ico">🖥</div><strong>Ordinateur Windows</strong><span>Imprimante USB ou réseau, via le programme Kudizy Print Connector.</span></button>
+            <button class="tile" data-go="imp-bt"><div class="ico">📱</div><strong>Téléphone ou tablette Android</strong><span>Imprimante Bluetooth, via l’application Kudizy POS.</span></button>
           </div>
           <div class="row-actions">
-            <button class="btn btn-g">Tester l’impression</button>
+            <button class="btn btn-g" data-go="catalogue-setup">Retour</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-imp-pc" data-g="onb">
+        <div class="form-card">
+          <div class="steps"><span class="on">1 Programme</span><span>2 Association</span><span>3 Imprimante</span><span>4 Test</span></div>
+          <h2 class="title">Installer Kudizy Print Connector</h2>
+          <p class="sub">Ce petit programme permet à la caisse d’imprimer sur l’ordinateur. Il s’installe une seule fois et démarre ensuite tout seul avec Windows.</p>
+          <div class="list" style="margin-bottom:14px">
+            <div class="list-row"><span>Print Connector</span><span class="tag fail">Introuvable sur cet ordinateur</span></div>
+          </div>
+          <p class="eyebrow">Comment faire</p>
+          <ol style="font-size:0.84rem;line-height:1.55;margin:0 0 14px 18px">
+            <li>Cliquez sur « Télécharger » puis ouvrez le fichier téléchargé.</li>
+            <li>Si le navigateur affiche un avertissement, choisissez « Conserver ».</li>
+            <li>Si Windows affiche « Windows a protégé votre ordinateur » : « Informations complémentaires » puis « Exécuter quand même ».</li>
+            <li>Une icône Kudizy apparaît près de l’horloge. Cette page la détecte toute seule.</li>
+          </ol>
+          <p class="field-hint" style="margin-bottom:12px">Recherche du programme toutes les 3 secondes…</p>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="imprimante">Retour</button>
+            <button class="btn btn-g" type="button">Télécharger</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="imp-pc-code">Programme détecté · Continuer</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-imp-pc-code" data-g="onb">
+        <div class="form-card">
+          <div class="steps"><span>1 Programme</span><span class="on">2 Association</span><span>3 Imprimante</span><span>4 Test</span></div>
+          <h2 class="title">Associer la caisse au programme</h2>
+          <p class="sub">Pour que seule votre caisse puisse imprimer, cliquez sur l’icône Kudizy près de l’horloge : un code à 6 chiffres s’affiche. Saisissez-le ici.</p>
+          <div class="field"><label>Code d’association</label><input inputmode="numeric" maxlength="6" placeholder="Ex. 482913" style="letter-spacing:0.3em;font-size:1.2rem" /></div>
+          <p class="field-hint" style="margin-bottom:12px">Le code ne sert qu’une fois. S’il est refusé, un nouveau code s’affiche dans l’icône : saisissez ce nouveau code.</p>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="imp-pc">Retour</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="imp-pc-choix">Associer</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-imp-pc-choix" data-g="onb">
+        <div class="form-card">
+          <div class="steps"><span>1 Programme</span><span>2 Association</span><span class="on">3 Imprimante</span><span>4 Test</span></div>
+          <h2 class="title">Choisir l’imprimante</h2>
+          <p class="sub">Comment l’imprimante est-elle reliée à l’ordinateur ?</p>
+          <div class="tabs" id="imp-mode">
+            <button class="tab on" type="button" data-mode="usb">Câble USB</button>
+            <button class="tab" type="button" data-mode="ip">Réseau (adresse IP)</button>
+          </div>
+          <div id="imp-usb">
+            <div class="field"><label>Imprimantes installées sur cet ordinateur</label>
+              <select><option>XP-80C</option><option>Microsoft Print to PDF</option></select>
+            </div>
+            <p class="field-hint" style="margin-bottom:12px">L’imprimante n’apparaît pas ? Branchez-la, allumez-la et installez son pilote Windows.</p>
+          </div>
+          <div id="imp-ip" style="display:none">
+            <div class="field"><label>Adresse IP de l’imprimante</label><input placeholder="Ex. 192.168.1.50" /></div>
+            <p class="field-hint" style="margin-bottom:12px">L’adresse s’imprime en général en maintenant le bouton FEED à l’allumage de l’imprimante.</p>
+          </div>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="imp-pc-code">Retour</button>
+            <span class="spacer"></span>
+            <button class="btn btn-p" data-go="imp-test">Enregistrer</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-imp-bt" data-g="onb">
+        <div class="form-card">
+          <div class="steps"><span class="on">1 Bluetooth</span><span>2 Imprimante</span><span>3 Test</span></div>
+          <h2 class="title">Imprimante Bluetooth</h2>
+          <p class="sub">Allumez l’imprimante. À la première utilisation, autorisez l’application à utiliser le Bluetooth quand Android le demande.</p>
+          <div class="list" style="margin-bottom:12px">
+            <div class="list-row"><span>Bluetooth</span><span class="tag">Activé et autorisé</span></div>
+          </div>
+          <p class="eyebrow">Imprimantes trouvées</p>
+          <div class="list" style="margin-bottom:12px">
+            <div class="list-row"><span>Printer001 <span class="meta-line">déjà appairée</span></span><button class="btn btn-p" style="padding:6px 12px;font-size:0.75rem" data-go="imp-test">Choisir</button></div>
+            <div class="list-row"><span>XP-P323B</span><button class="btn btn-g" style="padding:6px 12px;font-size:0.75rem" data-go="imp-test">Choisir</button></div>
+          </div>
+          <p class="field-hint" style="margin-bottom:12px">Aucune imprimante ? Vérifiez qu’elle est allumée et proche du téléphone, puis relancez la recherche.</p>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="imprimante">Retour</button>
+            <span class="spacer"></span>
+            <button class="btn btn-g" type="button">Rechercher à nouveau</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="s-imp-test" data-g="onb">
+        <div class="form-card">
+          <h2 class="title">Tester l’impression</h2>
+          <p class="sub">Imprimez un ticket de test pour vérifier que tout fonctionne.</p>
+          <div class="list" style="margin-bottom:12px">
+            <div class="list-row"><span>Imprimante</span><span>XP-80C</span></div>
+            <div class="list-row"><span>Résultat du test</span><span class="tag" id="imp-res">Ticket imprimé</span></div>
+          </div>
+          <div class="notif" id="imp-err" style="display:none"><div><strong>Plus de papier.</strong> Remettez un rouleau de papier puis relancez le test.</div></div>
+          <p class="field-hint" style="margin-bottom:12px">Autres erreurs possibles, toujours expliquées de la même façon : imprimante éteinte ou débranchée, capot ouvert, programme d’impression arrêté.</p>
+          <div class="row-actions">
+            <button class="btn btn-g" data-go="imprimante">Changer d’imprimante</button>
+            <button class="btn btn-g" type="button" id="btn-imp-test">Tester l’impression</button>
             <span class="spacer"></span>
             <button class="btn btn-p" data-go="bind">Attacher le device</button>
           </div>
@@ -780,7 +885,7 @@
             <select><option>Caisse 1</option><option>Comptoir</option></select>
           </div>
           <div class="row-actions">
-            <button class="btn btn-g" data-go="imprimante">Retour</button>
+            <button class="btn btn-g" data-go="imp-test">Retour</button>
             <span class="spacer"></span>
             <button class="btn btn-p btn-lg" data-go="pin">Confirmer · Écran PIN</button>
           </div>
@@ -1379,6 +1484,11 @@
         ["magasin", "Magasin"],
         ["catalogue-setup", "Catalogue"],
         ["imprimante", "Imprimante"],
+        ["imp-pc", "PC 1 Programme"],
+        ["imp-pc-code", "PC 2 Code"],
+        ["imp-pc-choix", "PC 3 USB/IP"],
+        ["imp-bt", "Android BT"],
+        ["imp-test", "Test"],
         ["bind", "Device"],
       ],
       caisse: [
@@ -1417,6 +1527,11 @@
       magasin: "Onboarding · magasin",
       "catalogue-setup": "Onboarding · catalogue",
       imprimante: "Config imprimante",
+      "imp-pc": "Imprimante PC · programme",
+      "imp-pc-code": "Imprimante PC · association",
+      "imp-pc-choix": "Imprimante PC · USB ou réseau",
+      "imp-bt": "Imprimante Android · Bluetooth",
+      "imp-test": "Imprimante · test",
       bind: "Rattachement device",
       pin: "Mini Marché · Caisse 1",
       "shift-open": "Marie · ouverture",
@@ -1544,6 +1659,22 @@
       box.classList.remove("show");
       box.querySelectorAll("input").forEach((i) => (i.value = ""));
     });
+    document.getElementById("imp-mode")?.addEventListener("click", (e) => {
+      const tab = e.target.closest(".tab[data-mode]");
+      if (!tab) return;
+      document.querySelectorAll("#imp-mode .tab").forEach((t) => t.classList.toggle("on", t === tab));
+      document.getElementById("imp-usb").style.display = tab.dataset.mode === "usb" ? "" : "none";
+      document.getElementById("imp-ip").style.display = tab.dataset.mode === "ip" ? "" : "none";
+    });
+    let impEchec = false;
+    document.getElementById("btn-imp-test")?.addEventListener("click", () => {
+      impEchec = !impEchec;
+      const res = document.getElementById("imp-res");
+      res.textContent = impEchec ? "Échec" : "Ticket imprimé";
+      res.className = "tag" + (impEchec ? " fail" : "");
+      document.getElementById("imp-err").style.display = impEchec ? "flex" : "none";
+    });
+
     let pin = "";
     const dots = [...document.querySelectorAll("#pin-dots i")];
     document.getElementById("pad").addEventListener("click", (e) => {
