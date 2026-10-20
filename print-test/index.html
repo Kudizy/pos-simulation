@@ -37,7 +37,7 @@
 <body>
 <main>
   <h1>Test d'impression Kudizy</h1>
-  <p class="sous-titre">Vérifie que la caisse imprime bien sur ce poste, sans passer par l'application. Print Connector attendu : version 1.0.1 ou plus récente.</p>
+  <p class="sous-titre">Vérifie que la caisse imprime bien sur ce poste, sans passer par l'application. Print Connector attendu : version 1.0.2 ou plus récente.</p>
 
   <section>
     <h2>1. Connexion</h2>
@@ -48,8 +48,8 @@
   <section id="bloc-telechargement" class="masque">
     <h2>Installer Kudizy Print Connector</h2>
     <div id="telechargement-windows">
-      <p class="detail">Ce petit programme permet à la caisse d'imprimer sur ce PC. Version à télécharger : <b>1.0.1</b>. Si une ancienne version tourne déjà, quittez-la (icône près de l'horloge → Quitter) avant d'ouvrir le nouveau fichier.</p>
-      <p><a id="lien-telechargement" class="bouton" download>Télécharger le Print Connector 1.0.1 (Windows)</a></p>
+      <p class="detail">Ce petit programme permet à la caisse d'imprimer sur ce PC. Version à télécharger : <b>1.0.2</b>. Si une ancienne version tourne déjà, quittez-la (icône près de l'horloge → Quitter) avant d'ouvrir le nouveau fichier.</p>
+      <p><a id="lien-telechargement" class="bouton" download>Télécharger le Print Connector 1.0.2 (Windows)</a></p>
       <ol class="etapes">
         <li>Si le navigateur signale un fichier « rarement téléchargé », choisissez <b>Conserver</b>.</li>
         <li>Ouvrez le fichier téléchargé.</li>
@@ -60,7 +60,7 @@
     <p id="telechargement-autre" class="detail masque">Le Print Connector fonctionne sur PC Windows. Sur téléphone ou tablette Android, ouvrez cette page dans l'application Kudizy.</p>
   </section>
 
-  <div id="alerte-version" class="alerte masque">Connecteur trop ancien. Téléchargez la version <b>1.0.1</b> (bouton ci-dessus ou section 1), quittez l'ancienne icône, puis relancez le nouveau fichier. Les versions antérieures créent des tickets vides sur le simulateur Docker.</div>
+  <div id="alerte-version" class="alerte masque">Connecteur trop ancien. Téléchargez la version <b>1.0.2</b> (bouton ci-dessus ou section 1), quittez l'ancienne icône, puis relancez le nouveau fichier. À partir de 1.0.2, les accents s'affichent correctement sur le simulateur Docker.</div>
 
   <section id="bloc-association" class="masque">
     <h2>2. Associer cette page au connecteur</h2>
@@ -81,7 +81,7 @@
     </div>
     <div id="aide-simulateur" class="aide detail masque">
       <p>Simulateur Docker (page des tickets : <a href="http://localhost:8080" target="_blank" rel="noopener">http://localhost:8080</a>)</p>
-      <p>Les titres <code>receipt…</code> ne sont pas le « Ticket n° » de cette page : ouvrez le ticket le plus récent (en haut) et cherchez « Ticket n° » ou « MINI MARCHÉ » dans le contenu.</p>
+      <p>Les titres <code>receipt…</code> sont les noms de fichiers du simulateur : ce n'est <b>pas</b> le numéro Kudizy. Ouvrez le ticket le plus récent (en haut) : le vrai numéro est la ligne <b>Ticket n° …</b> dans le contenu (avec « MINI MARCHÉ DU PLATEAU »).</p>
       <p>Vider la liste (pas de bouton dans l'interface) — PowerShell :</p>
       <pre>docker exec imprimante-virtuelle sh -c "rm -f /home/escpos-emu/web/receipts/* /home/escpos-emu/web/receipt_list.csv"</pre>
       <p style="margin-top:8px">Puis rechargez localhost:8080. Pour repartir de zéro :</p>
@@ -110,7 +110,7 @@ docker run -d --name imprimante-virtuelle -p 9100:9100 -p 8080:80 gilbertfl/escp
 <script>
 const CONNECTEUR = "http://127.0.0.1:9420";
 const CLE_JETON = "kz_token";
-const VERSION_MIN = "1.0.1";
+const VERSION_MIN = "1.0.2";
 const TELECHARGEMENT = "https://kudizy.github.io/pos-simulation/print-test/kudizy-print-connector.exe?v=" + VERSION_MIN;
 const $ = (id) => document.getElementById(id);
 const android = window.KudizyPrint || null;
