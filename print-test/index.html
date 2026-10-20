@@ -4,12 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kudizy – Test d'impression</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23131710'/%3E%3Cpath fill='%23078942' d='M9.2 8.2c0-.4.3-.7.7-.7h1.1c.3 0 .5.1.7.3l4.2 4.1V8.9c0-.4.3-.7.7-.7h1.4c.4 0 .7.3.7.7v14.2c0 .4-.3.7-.7.7h-1.4c-.4 0-.7-.3-.7-.7v-3.1l-4.3 3.9c-.2.2-.4.3-.7.3H9.9c-.5 0-.8-.5-.6-.9l5.1-7.4-4.7-4.6c-.3-.3-.5-.7-.5-1.1z'/%3E%3C/svg%3E">
 <style>
-  :root { --vert:#078942; --rouge:#c62828; --gris:#6b7280; --bord:#e5e7eb; }
+  :root { --vert:#078942; --rouge:#c62828; --gris:#6b7280; --bord:#e5e7eb; --noir:#131710; }
   * { box-sizing:border-box; }
   body { margin:0; font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:#f6f7f9; color:#111827; }
   main { max-width:720px; margin:0 auto; padding:20px 16px 40px; }
-  h1 { font-size:20px; margin:0 0 4px; }
+  .marque { display:flex; align-items:center; gap:12px; margin:0 0 6px; }
+  .marque svg { width:40px; height:40px; flex-shrink:0; border-radius:9px; }
+  h1 { font-size:20px; margin:0; }
   .sous-titre { color:var(--gris); margin:0 0 18px; }
   section { background:#fff; border:1px solid var(--bord); border-radius:10px; padding:14px 16px; margin-bottom:14px; }
   h2 { font-size:15px; margin:0 0 10px; }
@@ -36,8 +39,14 @@
 </head>
 <body>
 <main>
-  <h1>Test d'impression Kudizy</h1>
-  <p class="sous-titre">Vérifie que la caisse imprime bien sur ce poste, sans passer par l'application. Print Connector attendu : version 1.0.3 ou plus récente.</p>
+  <div class="marque">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true">
+      <rect width="32" height="32" rx="7" fill="#131710"/>
+      <path fill="#078942" d="M9.2 8.2c0-.4.3-.7.7-.7h1.1c.3 0 .5.1.7.3l4.2 4.1V8.9c0-.4.3-.7.7-.7h1.4c.4 0 .7.3.7.7v14.2c0 .4-.3.7-.7.7h-1.4c-.4 0-.7-.3-.7-.7v-3.1l-4.3 3.9c-.2.2-.4.3-.7.3H9.9c-.5 0-.8-.5-.6-.9l5.1-7.4-4.7-4.6c-.3-.3-.5-.7-.5-1.1z"/>
+    </svg>
+    <h1>Kudizy – Test d'impression</h1>
+  </div>
+  <p class="sous-titre">Vérifie que la caisse imprime bien sur ce poste, sans passer par l'application. Print Connector attendu : version 1.0.4 ou plus récente.</p>
 
   <section>
     <h2>1. Connexion</h2>
@@ -48,23 +57,23 @@
   <section id="bloc-telechargement" class="masque">
     <h2>Installer Kudizy Print Connector</h2>
     <div id="telechargement-windows">
-      <p class="detail">Ce petit programme permet à la caisse d'imprimer sur ce PC. Version à télécharger : <b>1.0.3</b>. Si une ancienne version tourne déjà, quittez-la (icône près de l'horloge → Quitter) avant d'ouvrir le nouveau fichier.</p>
-      <p><a id="lien-telechargement" class="bouton" download>Télécharger le Print Connector 1.0.3 (Windows)</a></p>
+      <p class="detail">Ce petit programme permet à la caisse d'imprimer sur ce PC. Version à télécharger : <b>1.0.4</b>. Si une ancienne version tourne déjà, quittez-la (icône imprimante près de l'horloge → Quitter) avant d'ouvrir le nouveau fichier.</p>
+      <p><a id="lien-telechargement" class="bouton" download>Télécharger le Print Connector 1.0.4 (Windows)</a></p>
       <ol class="etapes">
         <li>Si le navigateur signale un fichier « rarement téléchargé », choisissez <b>Conserver</b>.</li>
         <li>Ouvrez le fichier téléchargé.</li>
         <li>Si Windows affiche « Windows a protégé votre ordinateur », cliquez sur <b>Informations complémentaires</b>, puis sur <b>Exécuter quand même</b>.</li>
-        <li>L'icône Kudizy apparaît près de l'horloge. Cette page la détecte toute seule, sans recharger.</li>
+        <li>L'icône imprimante Kudizy (verte si prête, rouge sinon) apparaît près de l'horloge. Cette page la détecte toute seule, sans recharger.</li>
       </ol>
     </div>
     <p id="telechargement-autre" class="detail masque">Le Print Connector fonctionne sur PC Windows. Sur téléphone ou tablette Android, ouvrez cette page dans l'application Kudizy.</p>
   </section>
 
-  <div id="alerte-version" class="alerte masque">Connecteur trop ancien. Téléchargez la version <b>1.0.3</b> (bouton ci-dessus ou section 1), quittez l'ancienne icône, puis relancez le nouveau fichier. À partir de 1.0.3 : accents corrects et ticket qui ne déborde plus sur le simulateur Docker.</div>
+  <div id="alerte-version" class="alerte masque">Connecteur trop ancien. Téléchargez la version <b>1.0.4</b> (bouton ci-dessus ou section 1), quittez l'ancienne icône, puis relancez le nouveau fichier. À partir de 1.0.4 : ticket facture normalisée (maquette Figma) et icônes imprimante verte / rouge.</div>
 
   <section id="bloc-association" class="masque">
     <h2>2. Associer cette page au connecteur</h2>
-    <p class="detail">Le code à 6 chiffres s'affiche en cliquant sur l'icône Kudizy près de l'horloge Windows.</p>
+    <p class="detail">Le code à 6 chiffres s'affiche en cliquant sur l'icône imprimante près de l'horloge Windows.</p>
     <div class="ligne">
       <input id="code" class="code" inputmode="numeric" maxlength="6" placeholder="000000">
       <button id="btn-associer">Associer</button>
@@ -81,7 +90,7 @@
     </div>
     <div id="aide-simulateur" class="aide detail masque">
       <p>Simulateur Docker (page des tickets : <a href="http://localhost:8080" target="_blank" rel="noopener">http://localhost:8080</a>)</p>
-      <p>Les titres <code>receipt…</code> sont les noms de fichiers du simulateur : ce n'est <b>pas</b> le numéro Kudizy. Ouvrez le ticket le plus récent (en haut) : le vrai numéro est la ligne <b>Ticket n° …</b> dans le contenu (avec « MINI MARCHÉ DU PLATEAU »).</p>
+      <p>Les titres <code>receipt…</code> sont les noms de fichiers du simulateur : ce n'est <b>pas</b> le numéro de facture. Ouvrez le ticket le plus récent (en haut) : cherchez « LES COCOTIERS » et la ligne <b>N° FV…</b>.</p>
       <p>Vider la liste (pas de bouton dans l'interface) — PowerShell :</p>
       <pre>docker exec imprimante-virtuelle sh -c "rm -f /home/escpos-emu/web/receipts/* /home/escpos-emu/web/receipt_list.csv"</pre>
       <p style="margin-top:8px">Puis rechargez localhost:8080. Pour repartir de zéro :</p>
@@ -110,7 +119,7 @@ docker run -d --name imprimante-virtuelle -p 9100:9100 -p 8080:80 gilbertfl/escp
 <script>
 const CONNECTEUR = "http://127.0.0.1:9420";
 const CLE_JETON = "kz_token";
-const VERSION_MIN = "1.0.3";
+const VERSION_MIN = "1.0.4";
 const TELECHARGEMENT = "https://kudizy.github.io/pos-simulation/print-test/kudizy-print-connector.exe?v=" + VERSION_MIN;
 const $ = (id) => document.getElementById(id);
 const android = window.KudizyPrint || null;
@@ -182,29 +191,55 @@ async function appel(methode, chemin, corps) {
   return donnees;
 }
 
-// Ticket fictif au format attendu par le connecteur et par le pont Android.
+// Facture normalisée fictive (maquette Figma Kudizy POS – ticket 80 mm).
 function ticketFictif(numero) {
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const stamp = pad(now.getDate()) + "/" + pad(now.getMonth() + 1) + "/" + now.getFullYear()
+    + " " + pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds());
+  const num = "FV" + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate())
+    + "-" + String(numero).padStart(4, "0");
   return {
     job_id: "test-" + Date.now() + "-" + numero,
     width_mm: 80,
     blocks: [
-      { type: "text", text: "MINI MARCHÉ DU PLATEAU", align: "center", bold: true, size: 2 },
-      { type: "text", text: "Avenue Chardy, Abidjan", align: "center" },
-      { type: "text", text: "Tél. 07 00 00 00 00", align: "center" },
-      { type: "separator" },
-      { type: "row", left: "Ticket n° " + numero, right: new Date().toLocaleString("fr-FR") },
-      { type: "separator" },
-      { type: "row", left: "Riz parfumé 5 kg", right: "4 500 F" },
-      { type: "row", left: "Huile 1 L x2", right: "2 400 F" },
-      { type: "row", left: "Eau minérale 1,5 L x6", right: "2 100 F" },
-      { type: "separator" },
-      { type: "row", left: "TOTAL", right: "9 000 F", bold: true },
-      { type: "row", left: "Espèces", right: "10 000 F" },
-      { type: "row", left: "Rendu", right: "1 000 F" },
+      { type: "text", text: "LES COCOTIERS", align: "center", bold: true, size: 2 },
+      { type: "text", text: "Cotonou, Rue des Cocotiers", align: "center" },
+      { type: "text", text: "Tél. +229 01 97 00 00 00", align: "center" },
+      { type: "text", text: "IFU : 3202100123456", align: "center" },
+      { type: "text", text: "Régime : Réel Normal", align: "center" },
       { type: "feed", lines: 1 },
-      { type: "text", text: "Facture normalisée – code de vérification", align: "center" },
-      { type: "qr", data: "https://kudizy.com/verif/TEST-" + numero, size_mm: 30 },
-      { type: "text", text: "Merci de votre visite !", align: "center" },
+      { type: "text", text: "FACTURE DE VENTE NORMALISÉE", align: "center", bold: true },
+      { type: "feed", lines: 1 },
+      { type: "text", text: "N° " + num },
+      { type: "text", text: stamp },
+      { type: "text", text: "Caisse 1 - Awa Dossou" },
+      { type: "text", text: "Client : Client de passage" },
+      { type: "separator" },
+      { type: "row", left: "ARTICLE", right: "QTÉ * P.U.   TOTAL", bold: true },
+      { type: "separator" },
+      { type: "row", left: "Riz parfumé 5 kg", right: "1 x 5 500  5 500 A" },
+      { type: "row", left: "Huile végétale 1 L", right: "1 x 2 000  2 000 B" },
+      { type: "separator" },
+      { type: "row", left: "TOTAL", right: "7 500 F", bold: true, size: 2 },
+      { type: "row", left: "Espèces reçues", right: "10 000 F" },
+      { type: "row", left: "Monnaie rendue", right: "2 500 F" },
+      { type: "feed", lines: 1 },
+      { type: "row", left: "TAXES", right: "BASE HT  TVA   TTC", bold: true },
+      { type: "row", left: "A Exonéré", right: "5 500     0  5 500" },
+      { type: "row", left: "B TVA 18 %", right: "1 695   305  2 000" },
+      { type: "separator" },
+      { type: "text", text: "SÉCURITÉ DGI", align: "center", bold: true },
+      { type: "text", text: "NIM : BJ0100123456" },
+      { type: "text", text: "Compteurs : 0042 / 0128" },
+      { type: "text", text: "Heure MECeF : " + stamp },
+      { type: "text", text: "Code : AB12-CD34-EF56-GH78-IJ90" },
+      { type: "feed", lines: 1 },
+      { type: "qr", data: "https://verify.dgi.bj/demo/" + num, size_mm: 26 },
+      { type: "text", text: "Vérifiez ce ticket sur verify.dgi.bj", align: "center" },
+      { type: "text", text: "Merci de votre visite", align: "center" },
+      { type: "text", text: "Caisse Kudizy POS - kudizy.com", align: "center" },
+      { type: "feed", lines: 4 },
       { type: "cut" },
     ],
   };
