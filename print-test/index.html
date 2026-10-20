@@ -44,7 +44,7 @@
     <img src="kudizy-pos-app-icon.svg" width="40" height="40" alt="Kudizy">
     <h1>Kudizy – Test d'impression</h1>
   </div>
-  <p class="sous-titre">Vérifie que la caisse imprime bien sur ce poste, sans passer par l'application. Print Connector attendu : version 1.0.5 ou plus récente.</p>
+  <p class="sous-titre">Vérifie que la caisse imprime bien sur ce poste, sans passer par l'application. Print Connector attendu : version 1.0.6 ou plus récente.</p>
 
   <section>
     <h2>1. Connexion</h2>
@@ -55,8 +55,8 @@
   <section id="bloc-telechargement" class="masque">
     <h2>Installer Kudizy Print Connector</h2>
     <div id="telechargement-windows">
-      <p class="detail">Ce petit programme permet à la caisse d'imprimer sur ce PC. Version à télécharger : <b>1.0.5</b>. Si une ancienne version tourne déjà, quittez-la (icône imprimante près de l'horloge → Quitter) avant d'ouvrir le nouveau fichier.</p>
-      <p><a id="lien-telechargement" class="bouton" download>Télécharger le Print Connector 1.0.5 (Windows)</a></p>
+      <p class="detail">Ce petit programme permet à la caisse d'imprimer sur ce PC. Version à télécharger : <b>1.0.6</b>. Si une ancienne version tourne déjà, quittez-la (icône imprimante près de l'horloge → Quitter) avant d'ouvrir le nouveau fichier.</p>
+      <p><a id="lien-telechargement" class="bouton" download>Télécharger le Print Connector 1.0.6 (Windows)</a></p>
       <ol class="etapes">
         <li>Si le navigateur signale un fichier « rarement téléchargé », choisissez <b>Conserver</b>.</li>
         <li>Ouvrez le fichier téléchargé.</li>
@@ -67,7 +67,7 @@
     <p id="telechargement-autre" class="detail masque">Le Print Connector fonctionne sur PC Windows. Sur téléphone ou tablette Android, ouvrez cette page dans l'application Kudizy.</p>
   </section>
 
-  <div id="alerte-version" class="alerte masque">Connecteur trop ancien. Téléchargez la version <b>1.0.5</b> (bouton ci-dessus ou section 1), quittez l'ancienne icône, puis relancez le nouveau fichier. À partir de 1.0.5 : vraies icônes Figma et ticket sans débordement.</div>
+  <div id="alerte-version" class="alerte masque">Connecteur trop ancien. Téléchargez la version <b>1.0.6</b> (bouton ci-dessus ou section 1), quittez l'ancienne icône, puis relancez le nouveau fichier. À partir de 1.0.6 : USB « Kudizy Test Fichier » OK et pied de ticket corrigé.</div>
 
   <section id="bloc-association" class="masque">
     <h2>2. Associer cette page au connecteur</h2>
@@ -117,7 +117,7 @@ docker run -d --name imprimante-virtuelle -p 9100:9100 -p 8080:80 gilbertfl/escp
 <script>
 const CONNECTEUR = "http://127.0.0.1:9420";
 const CLE_JETON = "kz_token";
-const VERSION_MIN = "1.0.5";
+const VERSION_MIN = "1.0.6";
 const TELECHARGEMENT = "https://kudizy.github.io/pos-simulation/print-test/kudizy-print-connector.exe?v=" + VERSION_MIN;
 const $ = (id) => document.getElementById(id);
 const android = window.KudizyPrint || null;
@@ -239,12 +239,15 @@ function ticketFictif(numero) {
       { type: "text", text: "Code :" },
       { type: "text", text: "AB12-CD34-EF56-GH78-IJ90" },
       { type: "feed", lines: 1 },
-      { type: "qr", data: "https://verify.dgi.bj/demo/" + num, size_mm: 24 },
-      { type: "text", text: "Vérifiez sur verify.dgi.bj", align: "center" },
+      { type: "qr", data: "https://verify.dgi.bj/demo/" + num, size_mm: 20 },
+      { type: "feed", lines: 2 },
+      { type: "text", text: "Vérifiez sur", align: "center" },
+      { type: "text", text: "verify.dgi.bj", align: "center" },
+      { type: "feed", lines: 1 },
       { type: "text", text: "Merci de votre visite", align: "center" },
       { type: "text", text: "Caisse Kudizy POS", align: "center" },
       { type: "text", text: "kudizy.com", align: "center" },
-      { type: "feed", lines: 4 },
+      { type: "feed", lines: 5 },
       { type: "cut" },
     ],
   };
