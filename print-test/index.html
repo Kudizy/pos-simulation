@@ -29,12 +29,15 @@
   .etapes { margin:10px 0 0; padding-left:20px; color:#374151; }
   .etapes li { margin-bottom:4px; }
   .masque { display:none; }
+  .alerte { background:#fff7ed; border:1px solid #fdba74; border-radius:8px; padding:10px 12px; font-size:13px; color:#9a3412; margin-top:10px; }
+  .aide code { font:12px/1.4 ui-monospace,Menlo,Consolas,monospace; background:#f3f4f6; padding:1px 5px; border-radius:4px; }
+  .aide pre { margin:8px 0 0; padding:10px; background:#111827; color:#e5e7eb; border-radius:8px; font:12px/1.45 ui-monospace,Menlo,Consolas,monospace; overflow:auto; white-space:pre-wrap; }
 </style>
 </head>
 <body>
 <main>
   <h1>Test d'impression Kudizy</h1>
-  <p class="sous-titre">Vérifie que la caisse imprime bien sur ce poste, sans passer par l'application.</p>
+  <p class="sous-titre">Vérifie que la caisse imprime bien sur ce poste, sans passer par l'application. Print Connector attendu : version 1.0.1 ou plus récente.</p>
 
   <section>
     <h2>1. Connexion</h2>
@@ -45,8 +48,8 @@
   <section id="bloc-telechargement" class="masque">
     <h2>Installer Kudizy Print Connector</h2>
     <div id="telechargement-windows">
-      <p class="detail">Ce petit programme permet à la caisse d'imprimer sur ce PC. Il est à installer une seule fois.</p>
-      <p><a id="lien-telechargement" class="bouton" download>Télécharger le Print Connector (Windows)</a></p>
+      <p class="detail">Ce petit programme permet à la caisse d'imprimer sur ce PC. Version à télécharger : <b>1.0.1</b>. Si une ancienne version tourne déjà, quittez-la (icône près de l'horloge → Quitter) avant d'ouvrir le nouveau fichier.</p>
+      <p><a id="lien-telechargement" class="bouton" download>Télécharger le Print Connector 1.0.1 (Windows)</a></p>
       <ol class="etapes">
         <li>Si le navigateur signale un fichier « rarement téléchargé », choisissez <b>Conserver</b>.</li>
         <li>Ouvrez le fichier téléchargé.</li>
@@ -56,6 +59,8 @@
     </div>
     <p id="telechargement-autre" class="detail masque">Le Print Connector fonctionne sur PC Windows. Sur téléphone ou tablette Android, ouvrez cette page dans l'application Kudizy.</p>
   </section>
+
+  <div id="alerte-version" class="alerte masque">Connecteur trop ancien. Téléchargez la version <b>1.0.1</b> (bouton ci-dessus ou section 1), quittez l'ancienne icône, puis relancez le nouveau fichier. Les versions antérieures créent des tickets vides sur le simulateur Docker.</div>
 
   <section id="bloc-association" class="masque">
     <h2>2. Associer cette page au connecteur</h2>
@@ -71,8 +76,17 @@
     <div class="ligne" style="margin-bottom:8px">
       <select id="type"><option value="usb">USB</option><option value="network">Réseau (IP)</option></select>
       <select id="usb"></select>
-      <input id="ip" class="masque" placeholder="192.168.1.50">
+      <input id="ip" class="masque" placeholder="127.0.0.1">
       <button id="btn-imprimante">Enregistrer</button>
+    </div>
+    <div id="aide-simulateur" class="aide detail masque">
+      <p>Simulateur Docker (page des tickets : <a href="http://localhost:8080" target="_blank" rel="noopener">http://localhost:8080</a>)</p>
+      <p>Les titres <code>receipt…</code> ne sont pas le « Ticket n° » de cette page : ouvrez le ticket le plus récent (en haut) et cherchez « Ticket n° » ou « MINI MARCHÉ » dans le contenu.</p>
+      <p>Vider la liste (pas de bouton dans l'interface) — PowerShell :</p>
+      <pre>docker exec imprimante-virtuelle sh -c "rm -f /home/escpos-emu/web/receipts/* /home/escpos-emu/web/receipt_list.csv"</pre>
+      <p style="margin-top:8px">Puis rechargez localhost:8080. Pour repartir de zéro :</p>
+      <pre>docker rm -f imprimante-virtuelle
+docker run -d --name imprimante-virtuelle -p 9100:9100 -p 8080:80 gilbertfl/escpos-netprinter:3.2</pre>
     </div>
   </section>
 
@@ -96,11 +110,31 @@
 <script>
 const CONNECTEUR = "http://127.0.0.1:9420";
 const CLE_JETON = "kz_token";
-const TELECHARGEMENT = "https://kudizy.github.io/pos-simulation/print-test/kudizy-print-connector.exe";
+const VERSION_MIN = "1.0.1";
+const TELECHARGEMENT = "https://kudizy.github.io/pos-simulation/print-test/kudizy-print-connector.exe?v=" + VERSION_MIN;
 const $ = (id) => document.getElementById(id);
 const android = window.KudizyPrint || null;
 const windows = /Windows/i.test(navigator.userAgent);
 let attente = null;
+
+function versionTropAncienne(v) {
+  if (!v || v === "dev") return false;
+  const a = String(v).split(".").map(Number);
+  const b = VERSION_MIN.split(".").map(Number);
+  for (let i = 0; i < 3; i++) {
+    const x = a[i] || 0, y = b[i] || 0;
+    if (x < y) return true;
+    if (x > y) return false;
+  }
+  return false;
+}
+
+function majAideSimulateur() {
+  const reseau = $("type").value === "network";
+  const ip = ($("ip").value || "").trim();
+  const local = ip === "127.0.0.1" || ip === "localhost";
+  $("aide-simulateur").classList.toggle("masque", !(reseau && (local || !ip)));
+}
 
 // Tant que le connecteur est introuvable, on réessaie toutes les 3 secondes.
 function proposerTelechargement(afficher) {
@@ -216,8 +250,12 @@ async function rafraichir() {
   proposerTelechargement(false);
   if (!s.version) {
     afficherEtat(false, "Accès refusé", s.message || "Adresse de la page non autorisée par le connecteur.");
+    $("alerte-version").classList.add("masque");
     return;
   }
+  const ancienne = versionTropAncienne(s.version);
+  $("alerte-version").classList.toggle("masque", !ancienne);
+  if (ancienne) proposerTelechargement(true);
   $("bloc-association").classList.toggle("masque", s.paired);
   $("bloc-imprimante").classList.toggle("masque", !s.paired);
   if (!s.paired) {
@@ -228,9 +266,10 @@ async function rafraichir() {
     afficherEtat(false, "Associé – aucune imprimante choisie", "Choisissez l'imprimante à l'étape 3.");
   } else {
     const nom = s.printer.type === "network" ? s.printer.ip + ":" + s.printer.port : s.printer.name;
-    afficherEtat(s.printer.ready, (s.printer.ready ? "Prête : " : "Non prête : ") + nom, s.error ? s.error.message : "");
+    afficherEtat(s.printer.ready, (s.printer.ready ? "Prête : " : "Non prête : ") + nom + " · connecteur " + s.version, s.error ? s.error.message : "");
   }
   chargerUSB(s.printer);
+  majAideSimulateur();
 }
 
 async function chargerUSB(actuelle) {
@@ -255,9 +294,12 @@ function basculerType() {
   const reseau = $("type").value === "network";
   $("usb").classList.toggle("masque", reseau);
   $("ip").classList.toggle("masque", !reseau);
+  if (reseau && !$("ip").value) $("ip").value = "127.0.0.1";
+  majAideSimulateur();
 }
 
 $("type").onchange = basculerType;
+$("ip").oninput = majAideSimulateur;
 
 $("btn-associer").onclick = async () => {
   const r = await appel("POST", "/pair", { code: $("code").value.trim() });
