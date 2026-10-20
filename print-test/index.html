@@ -4,14 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kudizy – Test d'impression</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23131710'/%3E%3Cpath fill='%23078942' d='M9.2 8.2c0-.4.3-.7.7-.7h1.1c.3 0 .5.1.7.3l4.2 4.1V8.9c0-.4.3-.7.7-.7h1.4c.4 0 .7.3.7.7v14.2c0 .4-.3.7-.7.7h-1.4c-.4 0-.7-.3-.7-.7v-3.1l-4.3 3.9c-.2.2-.4.3-.7.3H9.9c-.5 0-.8-.5-.6-.9l5.1-7.4-4.7-4.6c-.3-.3-.5-.7-.5-1.1z'/%3E%3C/svg%3E">
+<link rel="icon" href="kudizy-pos-app-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="kudizy-pos-app-icon.png">
 <style>
   :root { --vert:#078942; --rouge:#c62828; --gris:#6b7280; --bord:#e5e7eb; --noir:#131710; }
   * { box-sizing:border-box; }
   body { margin:0; font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:#f6f7f9; color:#111827; }
   main { max-width:720px; margin:0 auto; padding:20px 16px 40px; }
   .marque { display:flex; align-items:center; gap:12px; margin:0 0 6px; }
-  .marque svg { width:40px; height:40px; flex-shrink:0; border-radius:9px; }
+  .marque img { width:40px; height:40px; flex-shrink:0; border-radius:9px; }
   h1 { font-size:20px; margin:0; }
   .sous-titre { color:var(--gris); margin:0 0 18px; }
   section { background:#fff; border:1px solid var(--bord); border-radius:10px; padding:14px 16px; margin-bottom:14px; }
@@ -40,13 +41,10 @@
 <body>
 <main>
   <div class="marque">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true">
-      <rect width="32" height="32" rx="7" fill="#131710"/>
-      <path fill="#078942" d="M9.2 8.2c0-.4.3-.7.7-.7h1.1c.3 0 .5.1.7.3l4.2 4.1V8.9c0-.4.3-.7.7-.7h1.4c.4 0 .7.3.7.7v14.2c0 .4-.3.7-.7.7h-1.4c-.4 0-.7-.3-.7-.7v-3.1l-4.3 3.9c-.2.2-.4.3-.7.3H9.9c-.5 0-.8-.5-.6-.9l5.1-7.4-4.7-4.6c-.3-.3-.5-.7-.5-1.1z"/>
-    </svg>
+    <img src="kudizy-pos-app-icon.svg" width="40" height="40" alt="Kudizy">
     <h1>Kudizy – Test d'impression</h1>
   </div>
-  <p class="sous-titre">Vérifie que la caisse imprime bien sur ce poste, sans passer par l'application. Print Connector attendu : version 1.0.4 ou plus récente.</p>
+  <p class="sous-titre">Vérifie que la caisse imprime bien sur ce poste, sans passer par l'application. Print Connector attendu : version 1.0.5 ou plus récente.</p>
 
   <section>
     <h2>1. Connexion</h2>
@@ -57,8 +55,8 @@
   <section id="bloc-telechargement" class="masque">
     <h2>Installer Kudizy Print Connector</h2>
     <div id="telechargement-windows">
-      <p class="detail">Ce petit programme permet à la caisse d'imprimer sur ce PC. Version à télécharger : <b>1.0.4</b>. Si une ancienne version tourne déjà, quittez-la (icône imprimante près de l'horloge → Quitter) avant d'ouvrir le nouveau fichier.</p>
-      <p><a id="lien-telechargement" class="bouton" download>Télécharger le Print Connector 1.0.4 (Windows)</a></p>
+      <p class="detail">Ce petit programme permet à la caisse d'imprimer sur ce PC. Version à télécharger : <b>1.0.5</b>. Si une ancienne version tourne déjà, quittez-la (icône imprimante près de l'horloge → Quitter) avant d'ouvrir le nouveau fichier.</p>
+      <p><a id="lien-telechargement" class="bouton" download>Télécharger le Print Connector 1.0.5 (Windows)</a></p>
       <ol class="etapes">
         <li>Si le navigateur signale un fichier « rarement téléchargé », choisissez <b>Conserver</b>.</li>
         <li>Ouvrez le fichier téléchargé.</li>
@@ -69,7 +67,7 @@
     <p id="telechargement-autre" class="detail masque">Le Print Connector fonctionne sur PC Windows. Sur téléphone ou tablette Android, ouvrez cette page dans l'application Kudizy.</p>
   </section>
 
-  <div id="alerte-version" class="alerte masque">Connecteur trop ancien. Téléchargez la version <b>1.0.4</b> (bouton ci-dessus ou section 1), quittez l'ancienne icône, puis relancez le nouveau fichier. À partir de 1.0.4 : ticket facture normalisée (maquette Figma) et icônes imprimante verte / rouge.</div>
+  <div id="alerte-version" class="alerte masque">Connecteur trop ancien. Téléchargez la version <b>1.0.5</b> (bouton ci-dessus ou section 1), quittez l'ancienne icône, puis relancez le nouveau fichier. À partir de 1.0.5 : vraies icônes Figma et ticket sans débordement.</div>
 
   <section id="bloc-association" class="masque">
     <h2>2. Associer cette page au connecteur</h2>
@@ -119,7 +117,7 @@ docker run -d --name imprimante-virtuelle -p 9100:9100 -p 8080:80 gilbertfl/escp
 <script>
 const CONNECTEUR = "http://127.0.0.1:9420";
 const CLE_JETON = "kz_token";
-const VERSION_MIN = "1.0.4";
+const VERSION_MIN = "1.0.5";
 const TELECHARGEMENT = "https://kudizy.github.io/pos-simulation/print-test/kudizy-print-connector.exe?v=" + VERSION_MIN;
 const $ = (id) => document.getElementById(id);
 const android = window.KudizyPrint || null;
@@ -191,7 +189,7 @@ async function appel(methode, chemin, corps) {
   return donnees;
 }
 
-// Facture normalisée fictive (maquette Figma Kudizy POS – ticket 80 mm).
+// Facture normalisée fictive (maquette Figma – 42 colonnes, sans débordement).
 function ticketFictif(numero) {
   const now = new Date();
   const pad = (n) => String(n).padStart(2, "0");
@@ -209,36 +207,43 @@ function ticketFictif(numero) {
       { type: "text", text: "IFU : 3202100123456", align: "center" },
       { type: "text", text: "Régime : Réel Normal", align: "center" },
       { type: "feed", lines: 1 },
-      { type: "text", text: "FACTURE DE VENTE NORMALISÉE", align: "center", bold: true },
+      { type: "text", text: "FACTURE DE VENTE", align: "center", bold: true },
+      { type: "text", text: "NORMALISÉE", align: "center", bold: true },
       { type: "feed", lines: 1 },
       { type: "text", text: "N° " + num },
       { type: "text", text: stamp },
       { type: "text", text: "Caisse 1 - Awa Dossou" },
       { type: "text", text: "Client : Client de passage" },
       { type: "separator" },
-      { type: "row", left: "ARTICLE", right: "QTÉ * P.U.   TOTAL", bold: true },
+      { type: "row", left: "ARTICLE", right: "QTÉ       TOTAL", bold: true },
       { type: "separator" },
-      { type: "row", left: "Riz parfumé 5 kg", right: "1 x 5 500  5 500 A" },
-      { type: "row", left: "Huile végétale 1 L", right: "1 x 2 000  2 000 B" },
+      { type: "text", text: "Riz parfumé 5 kg" },
+      { type: "row", left: "1 x 5 500", right: "5 500 A" },
+      { type: "text", text: "Huile végétale 1 L" },
+      { type: "row", left: "1 x 2 000", right: "2 000 B" },
       { type: "separator" },
-      { type: "row", left: "TOTAL", right: "7 500 F", bold: true, size: 2 },
+      { type: "text", text: "TOTAL", align: "center", bold: true },
+      { type: "text", text: "7 500 F", align: "center", bold: true, size: 2 },
       { type: "row", left: "Espèces reçues", right: "10 000 F" },
       { type: "row", left: "Monnaie rendue", right: "2 500 F" },
       { type: "feed", lines: 1 },
-      { type: "row", left: "TAXES", right: "BASE HT  TVA   TTC", bold: true },
+      { type: "row", left: "TAXES", right: "HT    TVA    TTC", bold: true },
       { type: "row", left: "A Exonéré", right: "5 500     0  5 500" },
       { type: "row", left: "B TVA 18 %", right: "1 695   305  2 000" },
       { type: "separator" },
       { type: "text", text: "SÉCURITÉ DGI", align: "center", bold: true },
       { type: "text", text: "NIM : BJ0100123456" },
       { type: "text", text: "Compteurs : 0042 / 0128" },
-      { type: "text", text: "Heure MECeF : " + stamp },
-      { type: "text", text: "Code : AB12-CD34-EF56-GH78-IJ90" },
+      { type: "text", text: "Heure MECeF :" },
+      { type: "text", text: stamp },
+      { type: "text", text: "Code :" },
+      { type: "text", text: "AB12-CD34-EF56-GH78-IJ90" },
       { type: "feed", lines: 1 },
-      { type: "qr", data: "https://verify.dgi.bj/demo/" + num, size_mm: 26 },
-      { type: "text", text: "Vérifiez ce ticket sur verify.dgi.bj", align: "center" },
+      { type: "qr", data: "https://verify.dgi.bj/demo/" + num, size_mm: 24 },
+      { type: "text", text: "Vérifiez sur verify.dgi.bj", align: "center" },
       { type: "text", text: "Merci de votre visite", align: "center" },
-      { type: "text", text: "Caisse Kudizy POS - kudizy.com", align: "center" },
+      { type: "text", text: "Caisse Kudizy POS", align: "center" },
+      { type: "text", text: "kudizy.com", align: "center" },
       { type: "feed", lines: 4 },
       { type: "cut" },
     ],
