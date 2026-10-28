@@ -60,21 +60,18 @@ input { font: inherit; }
 .b1 {
   flex: 1;
   min-height: 0;
+  background: var(--white);
 }
 
 .b1-brand {
   background: var(--ink);
   color: var(--white);
-  padding: 28px 28px calc(24px + var(--safe-b));
+  padding: 28px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 24px;
-}
-.b1-brand-top {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+  gap: 20px;
+  min-height: 0;
 }
 .b1-logo {
   display: flex;
@@ -83,8 +80,10 @@ input { font: inherit; }
   font-weight: 700;
   font-size: 1.15rem;
   letter-spacing: -0.02em;
+  flex: 0 0 auto;
 }
 .b1-logo img { width: 36px; height: 36px; border-radius: 8px; }
+.b1-timeblock { flex: 0 0 auto; }
 .b1-clock { font-size: clamp(2.4rem, 6vw, 3.6rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
 .b1-date { color: rgba(255,255,255,0.65); margin-top: 8px; font-size: 0.95rem; }
 .b1-caisse {
@@ -95,6 +94,7 @@ input { font: inherit; }
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 12px;
   padding: 12px 14px;
+  flex: 0 0 auto;
 }
 .b1-caisse-ico {
   width: 40px; height: 40px; border-radius: 10px;
@@ -102,6 +102,7 @@ input { font: inherit; }
   color: var(--kz-bright);
   display: grid; place-items: center;
   font-size: 1.2rem;
+  flex: 0 0 auto;
 }
 .b1-caisse strong { display: block; font-size: 0.95rem; }
 .b1-caisse span { color: rgba(255,255,255,0.55); font-size: 0.78rem; }
@@ -113,7 +114,16 @@ input { font: inherit; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 18px;
+  gap: 16px;
+  min-height: 0;
+  overflow: auto;
+}
+.b1-panel-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
 }
 .pin-status { min-height: 52px; text-align: center; }
 .pin-status h2 { font-size: 1.15rem; font-weight: 600; }
@@ -157,7 +167,7 @@ input { font: inherit; }
   color: var(--muted); font-size: 0.78rem; margin-top: 4px;
 }
 .b1-gerant {
-  margin-top: 8px;
+  margin-top: 4px;
   color: var(--muted);
   font-size: 0.82rem;
   display: inline-flex;
@@ -165,13 +175,32 @@ input { font: inherit; }
   gap: 6px;
   padding: 8px 10px;
   border-radius: 8px;
+  flex: 0 0 auto;
 }
 .b1-gerant:hover { background: #f3f4f6; color: var(--ink); }
 
-@media (min-width: 768px) {
-  .b1 { grid-template-columns: 1.05fr 1fr; }
+/* Desktop / grande tablette paysage : 2 colonnes — logo haut, heure milieu, caisse bas */
+@media (min-width: 900px) {
+  .screen.active.b1 {
+    grid-template-columns: minmax(280px, 1.05fr) minmax(320px, 1fr);
+    grid-template-rows: 1fr;
+    overflow: hidden;
+  }
+  .b1-brand {
+    height: 100%;
+    padding: 32px 28px;
+  }
+  /* 3 enfants + space-between = logo / heure / caisse (heure au centre, pas en bas) */
+  .b1-timeblock { margin: 0; }
+  .b1-panel {
+    height: 100%;
+    justify-content: center;
+  }
+  .b1-panel-main { gap: 18px; }
 }
-@media (max-width: 767px) {
+
+/* Mobile + tablette portrait : empilé — bandeau sombre compact + pavé blanc */
+@media (max-width: 899px) {
   .sim-badge {
     top: auto;
     bottom: calc(10px + var(--safe-b));
@@ -181,31 +210,28 @@ input { font: inherit; }
 
   .screen.active.b1 {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
     overflow: hidden;
   }
 
   .b1-brand {
-    padding: 14px 16px 18px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "logo time"
+      "caisse caisse";
+    align-items: start;
+    justify-content: initial;
     gap: 12px;
-    flex: 0 0 auto;
-    justify-content: flex-start;
+    padding: 14px 16px 20px;
+    height: auto;
   }
-  .b1-brand-top {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  .b1-timeblock { flex: 0 0 auto; }
-  .b1-logo { font-size: 1rem; }
+  .b1-logo { grid-area: logo; font-size: 1rem; }
   .b1-logo img { width: 28px; height: 28px; }
-  .b1-clock { font-size: 1.65rem; text-align: right; }
-  .b1-date { font-size: 0.75rem; text-align: right; margin-top: 2px; }
-  .b1-caisse {
-    padding: 10px 12px;
-    gap: 10px;
-  }
+  .b1-timeblock { grid-area: time; text-align: right; }
+  .b1-clock { font-size: 1.65rem; }
+  .b1-date { font-size: 0.75rem; margin-top: 2px; }
+  .b1-caisse { grid-area: caisse; padding: 10px 12px; gap: 10px; }
   .b1-caisse-ico { width: 34px; height: 34px; font-size: 1rem; border-radius: 8px; }
   .b1-caisse strong { font-size: 0.88rem; }
   .b1-caisse span {
@@ -217,26 +243,21 @@ input { font: inherit; }
   }
 
   .b1-panel {
-    flex: 1;
-    min-height: 0;
     justify-content: space-between;
     padding: 20px 16px calc(16px + var(--safe-b));
     gap: 12px;
     border-radius: 22px 22px 0 0;
-    margin-top: -10px;
+    margin-top: -12px;
     position: relative;
     z-index: 1;
     box-shadow: 0 -8px 28px rgba(19, 23, 16, 0.18);
+    background: var(--white);
   }
   .b1-panel-main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    width: 100%;
     flex: 1;
     min-height: 0;
     justify-content: center;
+    gap: 14px;
   }
   .pin-status { min-height: 0; }
   .pin-status h2 { font-size: 1.05rem; }
@@ -248,10 +269,8 @@ input { font: inherit; }
     width: min(100%, 280px);
     gap: 8px;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    flex: 0 1 auto;
   }
   .pad .key {
-    aspect-ratio: 1;
     max-height: 68px;
     width: 100%;
     font-size: 1.3rem;
@@ -259,10 +278,6 @@ input { font: inherit; }
   }
 
   .b1-hint { display: none; }
-  .b1-gerant {
-    margin-top: 0;
-    flex: 0 0 auto;
-  }
 }
 
 /* ========== B2 SHIFT ========== */

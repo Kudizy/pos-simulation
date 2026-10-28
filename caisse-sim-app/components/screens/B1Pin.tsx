@@ -75,16 +75,14 @@ export function B1Pin({ active, onSuccess, onToast }: Props) {
       hidden={!active}
     >
       <aside className="b1-brand">
-        <div className="b1-brand-top">
-          <div className="b1-logo">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/icons/kudizy-pos-app-icon.svg`} alt="" />
-            <span>kudizy</span>
-          </div>
-          <div className="b1-timeblock">
-            <div className="b1-clock">{clock.time}</div>
-            <div className="b1-date">{clock.date}</div>
-          </div>
+        <div className="b1-logo">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/icons/kudizy-pos-app-icon.svg`} alt="" />
+          <span>kudizy</span>
+        </div>
+        <div className="b1-timeblock">
+          <div className="b1-clock">{clock.time}</div>
+          <div className="b1-date">{clock.date}</div>
         </div>
         <div className="b1-caisse">
           <div className="b1-caisse-ico" aria-hidden="true">
