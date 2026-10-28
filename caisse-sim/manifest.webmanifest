@@ -1,4 +1,5 @@
 {
+  "id": "./",
   "name": "Kudizy POS — Simulation caisse",
   "short_name": "Kudizy Caisse",
   "description": "Simulation PWA React/Next.js des écrans B1–B3 (PIN, shift, vente). Sans backend.",
@@ -20,7 +21,13 @@
       "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

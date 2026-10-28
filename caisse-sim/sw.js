@@ -1,5 +1,5 @@
-/* Service worker — cache offline simulation B1–B3 (Next static export) */
-const CACHE = "kudizy-caisse-sim-next-v2";
+/* Service worker — network-first pour le HTML (évite stale index après redeploy) */
+const CACHE = "kudizy-caisse-sim-next-v3";
 
 self.addEventListener("install", (e) => {
   e.waitUntil(
@@ -7,8 +7,6 @@ self.addEventListener("install", (e) => {
       .open(CACHE)
       .then((c) =>
         c.addAll([
-          "./",
-          "./index.html",
           "./manifest.webmanifest",
           "./icons/icon-192.png",
           "./icons/icon-512.png",
@@ -32,17 +30,48 @@ self.addEventListener("activate", (e) => {
 
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
-  e.respondWith(
-    caches.match(e.request).then(
-      (cached) =>
-        cached ||
-        fetch(e.request)
-          .then((res) => {
+
+  const url = new URL(e.request.url);
+  const isNav = e.request.mode === "navigate" || e.request.destination === "document";
+  const isNextAsset = url.pathname.includes("/_next/");
+
+  // HTML / navigation : réseau d’abord (sinon vieil index → chunks 404)
+  if (isNav) {
+    e.respondWith(
+      fetch(e.request)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(e.request, copy));
+          return res;
+        })
+        .catch(() => caches.match(e.request).then((c) => c || caches.match("./")))
+    );
+    return;
+  }
+
+  // Assets hashed Next : cache-first OK
+  if (isNextAsset) {
+    e.respondWith(
+      caches.match(e.request).then(
+        (cached) =>
+          cached ||
+          fetch(e.request).then((res) => {
             const copy = res.clone();
             caches.open(CACHE).then((c) => c.put(e.request, copy));
             return res;
           })
-          .catch(() => caches.match("./index.html"))
-    )
+      )
+    );
+    return;
+  }
+
+  e.respondWith(
+    fetch(e.request)
+      .then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(e.request, copy));
+        return res;
+      })
+      .catch(() => caches.match(e.request))
   );
 });
