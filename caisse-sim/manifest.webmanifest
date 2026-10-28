@@ -1,8 +1,8 @@
 {
   "name": "Kudizy POS — Simulation caisse",
   "short_name": "Kudizy Caisse",
-  "description": "Simulation statique des écrans B1–B3 (PIN, shift, vente). Sans backend.",
-  "start_url": "./index.html",
+  "description": "Simulation PWA React/Next.js des écrans B1–B3 (PIN, shift, vente). Sans backend.",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",

@@ -1,0 +1,4 @@
+caisse-sim-app/node_modules/
+caisse-sim-app/.next/
+caisse-sim-app/out/
+.DS_Store
