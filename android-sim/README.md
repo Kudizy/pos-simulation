@@ -1,24 +1,29 @@
 # Kudizy Caisse Sim — APK Android (WebView)
 
-Coquille Android **API 29+ (Android 10 → 15)** qui charge la simulation PWA :
+Coquille **Android 10+ (API 29 → 35)** : WebView plein écran sur la simulation PWA.
 
-https://kudizy.github.io/pos-simulation/caisse-sim/
+URL chargée : https://kudizy.github.io/pos-simulation/caisse-sim/
 
-Même principe que l’app prod : WebView plein écran. Pas encore de pont Bluetooth.
+## Télécharger & installer sur ton téléphone
 
-## Installer l’APK (téléphone)
+APK debug (réseau requis) :
 
-1. Télécharger l’artifact **`kudizy-caisse-sim-debug`** du dernier workflow GitHub Actions  
-   (ou le fichier `app-debug.apk` joint à la release / Actions).
-2. Sur le téléphone : autoriser l’install depuis sources inconnues pour ce fichier.
-3. Ouvrir **Kudizy Caisse Sim** — la caisse B1–B3 s’affiche (réseau requis).
+**[KudizyCaisseSim-0.1.0-debug.apk](./dist/KudizyCaisseSim-0.1.0-debug.apk)**
 
-PIN démo : `1234` ou `4821`.
+Aussi sur GitHub :  
+https://github.com/Kudizy/pos-simulation/raw/main/android-sim/dist/KudizyCaisseSim-0.1.0-debug.apk
 
-## Build local (Android Studio / SDK)
+1. Envoie l’APK sur le téléphone (AirDrop, Drive, câble…).
+2. Autorise l’installation depuis cette source.
+3. Ouvre **Kudizy Caisse Sim**.
+4. PIN démo : `1234` ou `4821`.
+
+Package id : `bj.kudizy.caissesim.debug`
+
+## Build local
 
 ```bash
 cd Pos/android-sim
+# SDK + JDK déjà utilisables si .tools/ présent, sinon Android Studio
 ./gradlew :app:assembleDebug
-# APK → app/build/outputs/apk/debug/app-debug.apk
 ```
