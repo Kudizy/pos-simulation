@@ -199,7 +199,11 @@ input { font: inherit; }
   .b1-panel-main { gap: 18px; }
 }
 
-/* Mobile + tablette portrait : empilé — bandeau sombre compact + pavé blanc */
+/*
+ * Mobile + tablette portrait (Figma B1) :
+ * écran 100 % sombre — pas de feuille blanche.
+ * Logo/heure/caisse en haut, titre + points + pavé sombre, accès gérant.
+ */
 @media (max-width: 899px) {
   .sim-badge {
     top: auto;
@@ -212,6 +216,7 @@ input { font: inherit; }
     grid-template-columns: 1fr;
     grid-template-rows: auto minmax(0, 1fr);
     overflow: hidden;
+    background: var(--ink);
   }
 
   .b1-brand {
@@ -223,15 +228,22 @@ input { font: inherit; }
     align-items: start;
     justify-content: initial;
     gap: 12px;
-    padding: 14px 16px 20px;
+    padding: 16px 20px 8px;
     height: auto;
+    background: transparent;
   }
   .b1-logo { grid-area: logo; font-size: 1rem; }
   .b1-logo img { width: 28px; height: 28px; }
   .b1-timeblock { grid-area: time; text-align: right; }
   .b1-clock { font-size: 1.65rem; }
-  .b1-date { font-size: 0.75rem; margin-top: 2px; }
-  .b1-caisse { grid-area: caisse; padding: 10px 12px; gap: 10px; }
+  .b1-date { font-size: 0.75rem; margin-top: 2px; color: rgba(255, 255, 255, 0.55); }
+  .b1-caisse {
+    grid-area: caisse;
+    padding: 10px 12px;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
   .b1-caisse-ico { width: 34px; height: 34px; font-size: 1rem; border-radius: 8px; }
   .b1-caisse strong { font-size: 0.88rem; }
   .b1-caisse span {
@@ -244,40 +256,87 @@ input { font: inherit; }
 
   .b1-panel {
     justify-content: space-between;
-    padding: 20px 16px calc(16px + var(--safe-b));
-    gap: 12px;
-    border-radius: 22px 22px 0 0;
-    margin-top: -12px;
-    position: relative;
-    z-index: 1;
-    box-shadow: 0 -8px 28px rgba(19, 23, 16, 0.18);
-    background: var(--white);
+    align-items: center;
+    padding: 12px 20px calc(20px + var(--safe-b));
+    gap: 16px;
+    border-radius: 0;
+    margin-top: 0;
+    box-shadow: none;
+    background: transparent;
+    color: var(--white);
   }
   .b1-panel-main {
     flex: 1;
     min-height: 0;
     justify-content: center;
-    gap: 14px;
+    gap: 18px;
   }
+
   .pin-status { min-height: 0; }
-  .pin-status h2 { font-size: 1.05rem; }
-  .pin-status p { font-size: 0.8rem; }
-  .pin-dots { margin: 0; gap: 12px; }
-  .pin-dots i { width: 12px; height: 12px; }
+  .pin-status h2 {
+    font-size: 1.2rem;
+    color: var(--white);
+    font-weight: 600;
+  }
+  .pin-status p {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .pin-status.error h2,
+  .pin-status.error p { color: #ff8a80; }
+
+  .pin-dots { margin: 0; gap: 14px; }
+  .pin-dots i {
+    width: 12px;
+    height: 12px;
+    border-color: rgba(255, 255, 255, 0.35);
+    background: transparent;
+  }
+  .pin-dots i.on {
+    background: var(--white);
+    border-color: var(--white);
+  }
+  .pin-dots.error i { border-color: #ff8a80; }
+  .pin-dots.error i.on {
+    background: #ff8a80;
+    border-color: #ff8a80;
+  }
 
   .pad {
-    width: min(100%, 280px);
-    gap: 8px;
+    width: min(100%, 300px);
+    gap: 12px;
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .pad .key {
-    max-height: 68px;
+    aspect-ratio: 1;
+    max-height: 72px;
     width: 100%;
-    font-size: 1.3rem;
-    border-radius: 12px;
+    font-size: 1.45rem;
+    font-weight: 600;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--white);
+    box-shadow: none;
+  }
+  .pad .key:active {
+    background: rgba(255, 255, 255, 0.16);
+    transform: scale(0.97);
+  }
+  .pad .key.ghost {
+    border-color: transparent;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.65);
   }
 
   .b1-hint { display: none; }
+  .b1-gerant {
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .b1-gerant:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--white);
+  }
 }
 
 /* ========== B2 SHIFT ========== */

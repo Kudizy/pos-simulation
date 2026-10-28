@@ -1,5 +1,5 @@
 /* Service worker — network-first pour le HTML (évite stale index après redeploy) */
-const CACHE = "kudizy-caisse-sim-next-v3";
+const CACHE = "kudizy-caisse-sim-next-v4";
 
 self.addEventListener("install", (e) => {
   e.waitUntil(
