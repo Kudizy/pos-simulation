@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#078942">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Simulation Kudizy POS — écrans B1 à B3 (statique, sans backend)">
+  <title>Kudizy POS — Simulation caisse</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/kudizy-pos-app-icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="sim-badge">Simulation · B1–B3 · sans backend</div>
+  <div class="app" id="app">
+
+    <!-- B1 Écran PIN -->
+    <section class="screen active b1" id="screen-b1" aria-label="Écran PIN">
+      <aside class="b1-brand">
+        <div class="b1-logo">
+          <img src="icons/kudizy-pos-app-icon.svg" alt="">
+          <span>kudizy</span>
+        </div>
+        <div>
+          <div class="b1-clock" id="clock">--:--</div>
+          <div class="b1-date" id="date-label">—</div>
+        </div>
+        <div class="b1-caisse">
+          <div class="b1-caisse-ico" aria-hidden="true">🏪</div>
+          <div>
+            <strong id="caisse-name">Caisse 1</strong>
+            <span id="caisse-place">Supérette Les Cocotiers · Haie Vive, Cotonou</span>
+          </div>
+        </div>
+      </aside>
+      <div class="b1-panel">
+        <div class="pin-status" id="pin-status">
+          <h2>Entrez votre code</h2>
+          <p>Votre code personnel à 4 chiffres</p>
+        </div>
+        <div class="pin-dots" id="pin-dots" aria-live="polite">
+          <i></i><i></i><i></i><i></i>
+        </div>
+        <div class="pad" id="pad" role="group" aria-label="Pavé numérique">
+          <button type="button" class="key" data-k="1">1</button>
+          <button type="button" class="key" data-k="2">2</button>
+          <button type="button" class="key" data-k="3">3</button>
+          <button type="button" class="key" data-k="4">4</button>
+          <button type="button" class="key" data-k="5">5</button>
+          <button type="button" class="key" data-k="6">6</button>
+          <button type="button" class="key" data-k="7">7</button>
+          <button type="button" class="key" data-k="8">8</button>
+          <button type="button" class="key" data-k="9">9</button>
+          <button type="button" class="key blank" tabindex="-1" aria-hidden="true"></button>
+          <button type="button" class="key" data-k="0">0</button>
+          <button type="button" class="key ghost" data-k="back" aria-label="Effacer">⌫</button>
+        </div>
+        <p class="b1-hint">⌨️ Vous pouvez aussi taper votre code au clavier</p>
+        <button type="button" class="b1-gerant" id="btn-gerant">🔒 Accès gérant</button>
+      </div>
+    </section>
+
+    <!-- B2 Ouvrir le shift -->
+    <section class="screen b2" id="screen-b2" aria-label="Ouvrir le shift">
+      <div class="b2-card">
+        <p class="eyebrow" id="b2-eyebrow">Caisse 1</p>
+        <h1 id="b2-hello">Bonjour</h1>
+        <p class="sub">Indiquez le fond de caisse si besoin, puis commencez à vendre.</p>
+        <div class="field">
+          <label for="fond">Fond de caisse (facultatif)</label>
+          <input id="fond" type="text" inputmode="numeric" placeholder="Ex. 5 000" value="5 000">
+          <p class="hint">Montant d’espèces présent dans le tiroir au démarrage.</p>
+        </div>
+        <div class="b2-actions">
+          <button type="button" class="btn btn-primary btn-block" id="btn-open-shift">Ouvrir et vendre</button>
+          <button type="button" class="btn btn-ghost btn-block" id="btn-logout">Changer de caissier</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- B3 Vente -->
+    <section class="screen b3" id="screen-b3" aria-label="Vente">
+      <header class="b3-top">
+        <div class="who">
+          <strong id="b3-cashier">—</strong>
+          <span> · Shift ouvert</span>
+        </div>
+        <div class="meta">
+          <span class="chip ok" id="print-chip">Imprimante · simulation</span>
+          <span class="chip" id="caisse-chip">Caisse 1</span>
+        </div>
+      </header>
+      <div class="b3-body">
+        <div class="catalog">
+          <div class="search">
+            <input id="prod-search" type="search" placeholder="Rechercher un produit…" autocomplete="off">
+          </div>
+          <div class="cats" id="cats"></div>
+          <div class="prods" id="prod-grid"></div>
+        </div>
+        <aside class="cart">
+          <h3>Panier</h3>
+          <div class="client-row">
+            <span>Client · <strong>Client de passage</strong></span>
+          </div>
+          <div class="lines" id="cart-lines"></div>
+          <div class="cart-foot">
+            <div class="total-row">
+              <span>TOTAL</span>
+              <strong id="cart-total">0 F</strong>
+            </div>
+            <button type="button" class="btn-encaisser" id="btn-encaisser" disabled>Encaisser</button>
+            <div class="cart-links">
+              <button type="button" class="btn btn-ghost" id="btn-history">Historique</button>
+              <button type="button" class="btn btn-ghost" id="btn-close-shift">Clôturer</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
