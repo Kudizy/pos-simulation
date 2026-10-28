@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.KudizyCaisseSim" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#078942</item>
+        <item name="colorPrimaryVariant">#056b34</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:statusBarColor">#131710</item>
+        <item name="android:navigationBarColor">#131710</item>
+        <item name="android:windowBackground">#131710</item>
+    </style>
+</resources>

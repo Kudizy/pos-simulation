@@ -1,0 +1,37 @@
+name: Build Android sim APK
+
+on:
+  push:
+    paths:
+      - "android-sim/**"
+      - ".github/workflows/android-sim.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android-sim
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Assemble debug APK
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: kudizy-caisse-sim-debug
+          path: android-sim/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
