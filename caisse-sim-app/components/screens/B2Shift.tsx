@@ -16,7 +16,12 @@ export function B2Shift({ active, cashier, onOpen, onLogout }: Props) {
   const first = cashier?.nom.split(" ")[0] ?? "";
 
   return (
-    <section className={`screen b2${active ? " active" : ""}`} aria-label="Ouvrir le shift" aria-hidden={!active}>
+    <section
+      className={`screen b2${active ? " active" : ""}`}
+      aria-label="Ouvrir le shift"
+      aria-hidden={!active}
+      hidden={!active}
+    >
       <div className="b2-card">
         <p className="eyebrow">
           {CAISSE.nom} · {cashier?.nom ?? ""}

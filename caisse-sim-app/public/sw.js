@@ -1,5 +1,5 @@
 /* Service worker — cache offline simulation B1–B3 (Next static export) */
-const CACHE = "kudizy-caisse-sim-next-v1";
+const CACHE = "kudizy-caisse-sim-next-v2";
 
 self.addEventListener("install", (e) => {
   e.waitUntil(

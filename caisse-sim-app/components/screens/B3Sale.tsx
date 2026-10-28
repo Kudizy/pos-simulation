@@ -53,7 +53,12 @@ export function B3Sale({ active, cashier, cart, onCartChange, onToast, onCloseSh
   }
 
   return (
-    <section className={`screen b3${active ? " active" : ""}`} aria-label="Vente" aria-hidden={!active}>
+    <section
+      className={`screen b3${active ? " active" : ""}`}
+      aria-label="Vente"
+      aria-hidden={!active}
+      hidden={!active}
+    >
       <header className="b3-top">
         <div className="who">
           <strong>{cashier?.nom ?? "—"}</strong>

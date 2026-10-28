@@ -68,16 +68,23 @@ export function B1Pin({ active, onSuccess, onToast }: Props) {
   const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "blank", "0", "back"] as const;
 
   return (
-    <section className={`screen b1${active ? " active" : ""}`} aria-label="Écran PIN" aria-hidden={!active}>
+    <section
+      className={`screen b1${active ? " active" : ""}`}
+      aria-label="Écran PIN"
+      aria-hidden={!active}
+      hidden={!active}
+    >
       <aside className="b1-brand">
-        <div className="b1-logo">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/icons/kudizy-pos-app-icon.svg`} alt="" />
-          <span>kudizy</span>
-        </div>
-        <div>
-          <div className="b1-clock">{clock.time}</div>
-          <div className="b1-date">{clock.date}</div>
+        <div className="b1-brand-top">
+          <div className="b1-logo">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/icons/kudizy-pos-app-icon.svg`} alt="" />
+            <span>kudizy</span>
+          </div>
+          <div className="b1-timeblock">
+            <div className="b1-clock">{clock.time}</div>
+            <div className="b1-date">{clock.date}</div>
+          </div>
         </div>
         <div className="b1-caisse">
           <div className="b1-caisse-ico" aria-hidden="true">
@@ -90,45 +97,47 @@ export function B1Pin({ active, onSuccess, onToast }: Props) {
         </div>
       </aside>
       <div className="b1-panel">
-        <div className={`pin-status${error ? " error" : ""}`}>
-          <h2>{error ? "Code incorrect" : "Entrez votre code"}</h2>
-          <p>
-            {error
-              ? "Réessayez ou demandez votre code au gérant."
-              : "Votre code personnel à 4 chiffres"}
-          </p>
-        </div>
-        <div className={`pin-dots${error ? " error" : ""}`} aria-live="polite">
-          {[0, 1, 2, 3].map((i) => (
-            <i key={i} className={i < pin.length ? "on" : undefined} />
-          ))}
-        </div>
-        <div className="pad" role="group" aria-label="Pavé numérique">
-          {keys.map((k) => {
-            if (k === "blank") {
-              return <button key={k} type="button" className="key blank" tabIndex={-1} aria-hidden />;
-            }
-            if (k === "back") {
+        <div className="b1-panel-main">
+          <div className={`pin-status${error ? " error" : ""}`}>
+            <h2>{error ? "Code incorrect" : "Entrez votre code"}</h2>
+            <p>
+              {error
+                ? "Réessayez ou demandez votre code au gérant."
+                : "Votre code personnel à 4 chiffres"}
+            </p>
+          </div>
+          <div className={`pin-dots${error ? " error" : ""}`} aria-live="polite">
+            {[0, 1, 2, 3].map((i) => (
+              <i key={i} className={i < pin.length ? "on" : undefined} />
+            ))}
+          </div>
+          <div className="pad" role="group" aria-label="Pavé numérique">
+            {keys.map((k) => {
+              if (k === "blank") {
+                return <button key={k} type="button" className="key blank" tabIndex={-1} aria-hidden />;
+              }
+              if (k === "back") {
+                return (
+                  <button
+                    key={k}
+                    type="button"
+                    className="key ghost"
+                    aria-label="Effacer"
+                    onClick={backspace}
+                  >
+                    ⌫
+                  </button>
+                );
+              }
               return (
-                <button
-                  key={k}
-                  type="button"
-                  className="key ghost"
-                  aria-label="Effacer"
-                  onClick={backspace}
-                >
-                  ⌫
+                <button key={k} type="button" className="key" onClick={() => pushDigit(k)}>
+                  {k}
                 </button>
               );
-            }
-            return (
-              <button key={k} type="button" className="key" onClick={() => pushDigit(k)}>
-                {k}
-              </button>
-            );
-          })}
+            })}
+          </div>
+          <p className="b1-hint">⌨️ Vous pouvez aussi taper votre code au clavier</p>
         </div>
-        <p className="b1-hint">⌨️ Vous pouvez aussi taper votre code au clavier</p>
         <button
           type="button"
           className="b1-gerant"
